@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remember App - Support</title>
+  <title>Remember</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -27,19 +27,44 @@
       font-size: 18px;
       line-height: 1.6;
     }
-    .email {
-      font-weight: bold;
-      font-size: 20px;
-      margin: 20px 0;
+    .app-icon {
+      display: block;
+      margin: 0 auto 16px;
+      width: 120px;
+      height: 120px;
+      border-radius: 24px;
+    }
+    .caption {
+      font-size: 18px;
+      color: #666;
+      margin: 8px 0 24px;
+    }
+    .buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .store-badge {
+      height: 48px;
+      width: auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Remember App Support</h1>
-    <p>For any questions, issues, or feedback, feel free to contact us at:</p>
-    <p class="email">📧 remember.helpdesk@gmail.com</p>
-    <p>We usually reply within 24–48 hours.</p>
+    <img src="images/appIcon.webp" alt="Remember App Icon" class="app-icon" width="120" height="120" />
+    <h1>Remember</h1>
+    <p class="caption">Your personal memory companion</p>
+    <div class="buttons">
+      <a href="https://apps.apple.com/ro/app/remember-memory-companion/id6747390663" aria-label="Download on the App Store">
+        <img src="images/downloadApple.webp" alt="Download on the App Store" class="store-badge" />
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=com.supercrg.remember" aria-label="Get it on Google Play">
+        <img src="images/downloadGoogle.webp" alt="Get it on Google Play" class="store-badge" />
+      </a>
+    </div>
   </div>
 </body>
 </html>
