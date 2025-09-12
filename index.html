@@ -7,10 +7,11 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #fafafa;
+      background: linear-gradient(180deg, #ffb225 0%, #fee48d 100%);
       color: #333;
       text-align: center;
       padding: 50px;
+      min-height: 100vh;
     }
     .container {
       max-width: 800px;
@@ -81,6 +82,12 @@
     }
     .footer a { color: #3366cc; text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
