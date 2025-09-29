@@ -90,6 +90,14 @@
       }
     }
   </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7M424SWMFB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-7M424SWMFB');
+  </script>
 </head>
 <body>
   <div class="container">
@@ -111,7 +119,8 @@
     <div class="video-embed" style="max-width: 420px; margin: 0 auto 8px;">
       <div style="position: relative; width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden;">
         <iframe
-          src="https://www.youtube.com/embed/PlOfxdc0Ytc?rel=0&modestbranding=1"
+          id="hero-video"
+          src="https://www.youtube.com/embed/PlOfxdc0Ytc?rel=0&modestbranding=1&enablejsapi=1"
           title="Remember app overview"
           style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;"
           loading="lazy"
@@ -144,5 +153,76 @@
       <a href="privacy.html">Privacy Policy</a>
     </div>
   </div>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- Analytics & Event Tracking -->
+  <script>
+    (function initAnalytics(){
+      // Add origin to YouTube iframe when served over http(s)
+      var iframe = document.getElementById('hero-video');
+      if (iframe && location.origin && /^https?:/i.test(location.origin) && iframe.src.indexOf('origin=') === -1) {
+        var sep = iframe.src.indexOf('?') === -1 ? '?' : '&';
+        iframe.src = iframe.src + sep + 'origin=' + encodeURIComponent(location.origin);
+      }
+
+      // Link click tracking for store buttons
+      var storeLinks = document.querySelectorAll('.buttons a');
+      storeLinks.forEach(function(a){
+        a.addEventListener('click', function(){
+          if (typeof gtag === 'function') {
+            var label = (a.getAttribute('aria-label') || '').toLowerCase();
+            var store = label.indexOf('app store') !== -1 ? 'apple' : (label.indexOf('google play') !== -1 ? 'google' : 'unknown');
+            gtag('event', 'store_click', {
+              store: store,
+              link_url: a.href,
+              transport_type: 'beacon'
+            });
+          }
+        });
+      });
+
+      // Link click tracking for social buttons
+      var socialLinks = document.querySelectorAll('.social-buttons a');
+      socialLinks.forEach(function(a){
+        a.addEventListener('click', function(){
+          if (typeof gtag === 'function') {
+            gtag('event', 'social_click', {
+              network: a.getAttribute('aria-label') || 'unknown',
+              link_url: a.href,
+              transport_type: 'beacon'
+            });
+          }
+        });
+      });
+    })();
+
+    // YouTube player tracking
+    var ytPlayer;
+    function onYouTubeIframeAPIReady(){
+      var el = document.getElementById('hero-video');
+      if (!el) return;
+      ytPlayer = new YT.Player('hero-video', {
+        events: {
+          onStateChange: function(e){
+            if (typeof gtag !== 'function') return;
+            var baseParams = { video_title: 'Remember app overview', video_id: 'PlOfxdc0Ytc' };
+            switch(e.data){
+              case YT.PlayerState.PLAYING:
+                gtag('event', 'video_play', Object.assign({} , baseParams));
+                break;
+              case YT.PlayerState.PAUSED:
+                gtag('event', 'video_pause', Object.assign({} , baseParams));
+                break;
+              case YT.PlayerState.ENDED:
+                gtag('event', 'video_complete', Object.assign({} , baseParams));
+                break;
+            }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
