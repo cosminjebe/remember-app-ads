@@ -22,6 +22,15 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+    .lang-select {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+    .lang-select select {
+      font-size: 14px;
+      padding: 4px 8px;
+    }
     h1 {
       color: #444;
     }
@@ -101,20 +110,27 @@
 </head>
 <body>
   <div class="container">
+    <div class="lang-select">
+      <select id="langSelect" aria-label="Language">
+        <option value="en">EN</option>
+        <option value="ro">RO</option>
+        <option value="es">ES</option>
+      </select>
+    </div>
     <img src="images/appIcon.webp" alt="Remember App Icon" class="app-icon" width="120" height="120" />
-    <h1>Remember</h1>
-    <p class="caption">Your personal memory companion</p>
+    <h1 id="h1Title">Remember</h1>
+    <p class="caption" id="caption">Your personal memory companion</p>
     <div class="buttons">
-      <a href="https://apps.apple.com/ro/app/remember-memory-companion/id6747390663" aria-label="Download on the App Store">
+      <a id="appleLink" href="https://apps.apple.com/ro/app/remember-memory-companion/id6747390663" aria-label="Download on the App Store">
         <img src="images/downloadApple.webp" alt="Download on the App Store" class="store-badge" />
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.supercrg.remember" aria-label="Get it on Google Play">
+      <a id="googleLink" href="https://play.google.com/store/apps/details?id=com.supercrg.remember" aria-label="Get it on Google Play">
         <img src="images/downloadGoogle.webp" alt="Get it on Google Play" class="store-badge" />
       </a>
     </div>
     <div class="promo">
-      <p>A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
-      <p>Watch the video below to discover how Remember works and explore all its features.</p>
+      <p id="promo1">A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
+      <p id="promo2">Watch the video below to discover how Remember works and explore all its features.</p>
     </div>
     <div class="video-embed" style="max-width: 420px; margin: 0 auto 8px;">
       <div style="position: relative; width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden;">
@@ -131,7 +147,7 @@
       </div>
     </div>
     <div class="socials">
-      <p class="socials-title">Our socials</p>
+      <p class="socials-title" id="socialsTitle">Our socials</p>
       <div class="social-buttons">
         <a href="https://www.facebook.com/profile.php?id=61579630469393" aria-label="Facebook" rel="noopener">
           <img src="images/facebookButton.webp" alt="Facebook" class="social-badge" />
@@ -148,11 +164,107 @@
       </div>
     </div>
     <div class="footer">
-      <a href="mailto:remember.helpdesk@gmail.com">Support</a>
+      <a id="footerSupport" href="mailto:remember.helpdesk@gmail.com">Support</a>
       <span>•</span>
-      <a href="privacy.html">Privacy Policy</a>
+      <a id="footerPrivacy" href="privacy.html">Privacy Policy</a>
     </div>
   </div>
+
+  <!-- I18N -->
+  <script>
+    (function(){
+      var translations = {
+        en: {
+          '#documentTitle': 'Remember',
+          '#h1Title': 'Remember',
+          '#caption': 'Your personal memory companion',
+          '#promo1': 'A simple, private self-care app that helps you capture and cherish life\u2019s meaningful moments.',
+          '#promo2': 'Watch the video below to discover how Remember works and explore all its features.',
+          '#socialsTitle': 'Our socials',
+          '#footerSupport': 'Support',
+          '#footerPrivacy': 'Privacy Policy',
+          '#appleAria': 'Download on the App Store',
+          '#googleAria': 'Get it on Google Play',
+          '#ytTitle': 'Remember app overview'
+        },
+        ro: {
+          '#documentTitle': 'Remember',
+          '#h1Title': 'Remember',
+          '#caption': 'Companionul tău pentru amintiri',
+          '#promo1': 'O aplicație simplă și privată pentru îngrijire de sine, care te ajută să surprinzi și să prețuiești momentele importante din viață.',
+          '#promo2': 'Urmărește videoclipul de mai jos ca să vezi cum funcționează Remember și să descoperi toate funcțiile.',
+          '#socialsTitle': 'Rețelele noastre',
+          '#footerSupport': 'Asistență',
+          '#footerPrivacy': 'Politica de confidențialitate',
+          '#appleAria': 'Descarcă din App Store',
+          '#googleAria': 'Ia-l de pe Google Play',
+          '#ytTitle': 'Prezentare generală a aplicației Remember'
+        },
+        es: {
+          '#documentTitle': 'Remember',
+          '#h1Title': 'Remember',
+          '#caption': 'Tu compañero personal de recuerdos',
+          '#promo1': 'Una app sencilla y privada de autocuidado que te ayuda a capturar y apreciar los momentos más significativos de la vida.',
+          '#promo2': 'Mira el video a continuación para descubrir cómo funciona Remember y explorar todas sus funciones.',
+          '#socialsTitle': 'Nuestras redes',
+          '#footerSupport': 'Asistencia',
+          '#footerPrivacy': 'Política de privacidad',
+          '#appleAria': 'Descargar en el App Store',
+          '#googleAria': 'Consíguelo en Google Play',
+          '#ytTitle': 'Descripción general de la app Remember'
+        }
+      };
+
+      function renderI18n(lang){
+        var dict = translations[lang] || translations.en;
+        try { if (typeof dict['#documentTitle'] === 'string') { document.title = dict['#documentTitle']; } } catch(e) {}
+        var el;
+        function setText(idKey, elId){
+          var text = dict[idKey];
+          if (typeof text !== 'string') return;
+          el = document.getElementById(elId);
+          if (el) el.textContent = text;
+        }
+        setText('#h1Title','h1Title');
+        setText('#caption','caption');
+        setText('#promo1','promo1');
+        setText('#promo2','promo2');
+        setText('#socialsTitle','socialsTitle');
+        setText('#footerSupport','footerSupport');
+        setText('#footerPrivacy','footerPrivacy');
+        var aApple = document.getElementById('appleLink');
+        var aGoogle = document.getElementById('googleLink');
+        if (aApple && typeof dict['#appleAria'] === 'string') aApple.setAttribute('aria-label', dict['#appleAria']);
+        if (aGoogle && typeof dict['#googleAria'] === 'string') aGoogle.setAttribute('aria-label', dict['#googleAria']);
+        var yt = document.getElementById('hero-video');
+        if (yt && typeof dict['#ytTitle'] === 'string') yt.setAttribute('title', dict['#ytTitle']);
+      }
+
+      function applyLang(lang){
+        document.documentElement.setAttribute('lang', lang);
+        renderI18n(lang);
+      }
+
+      (function init(){
+        var stored = null;
+        try { stored = localStorage.getItem('lang'); } catch(e) {}
+        var lang = (stored === 'en' || stored === 'ro' || stored === 'es') ? stored : 'en';
+        applyLang(lang);
+        var sel = document.getElementById('langSelect');
+        if (sel) {
+          sel.value = lang;
+          sel.addEventListener('change', function(){
+            var newLang = sel.value;
+            try { localStorage.setItem('lang', newLang); } catch(e) {}
+            applyLang(newLang);
+            if (typeof gtag === 'function') {
+              gtag('event', 'language_change', { language: newLang });
+            }
+          });
+        }
+      })();
+    })();
+  </script>
 
   <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
