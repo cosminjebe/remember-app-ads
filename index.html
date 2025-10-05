@@ -106,6 +106,32 @@
     @media (min-width: 768px) {
       .hero-inner { grid-template-columns: 1fr 1fr; align-items: center; }
     }
+    /* Showcase section */
+    :root { --shot-width: 220px; }
+    .showcase { margin: 24px 0; background: linear-gradient(180deg, #fff6db 0%, #fff9e9 100%); padding: 40px 20px; border-radius: 12px; }
+    .showcase-title { margin: 0 0 4px; font-size: 20px; font-weight: bold; color: #444; text-align: center; }
+    .showcase-subtitle { margin: 0 0 16px; font-size: 15px; color: #555; text-align: center; }
+    .showcase-inner { display: grid; gap: 16px; }
+    .showcase-video { border-radius: 12px; overflow: hidden; }
+    .showcase-video .video-wrapper { position: relative; width: var(--shot-width); margin: 0 auto; aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden; }
+    .showcase-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .screenshots { position: relative; }
+    .shots-scroller { display: flex; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; padding-bottom: 6px; width: var(--shot-width); margin: 0 auto; }
+    .shot { flex: 0 0 var(--shot-width); scroll-snap-align: center; }
+    .shot-img { width: 100%; height: auto; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: transform .2s ease, filter .2s ease; display: block; }
+    .shot-img:hover { transform: translateY(-3px); filter: brightness(1.03); }
+    .shot-cap { font-size: 13px; color: #555; margin: 6px 0 0; text-align: center; }
+    .shots-nav { display: none; }
+    @media (min-width: 992px) {
+      .showcase-inner { grid-template-columns: 1fr 1fr; align-items: start; }
+      .showcase-title, .showcase-subtitle { text-align: left; }
+      .shots-nav { display: flex; gap: 8px; justify-content: flex-end; margin: 6px 0; }
+      .shots-btn { border: none; background: #eeeeee; color: #333; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+      .shots-btn:focus-visible { outline: 3px solid #3366cc; outline-offset: 2px; }
+      /* Make video as big as a screenshot card on desktop */
+      .showcase-video { display: flex; justify-content: center; }
+      .showcase-video .video-wrapper { width: var(--shot-width); }
+    }
     /* Features section */
     .features {
       margin: 16px 0 24px;
@@ -293,20 +319,20 @@
       <p id="promo1">A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
       <p id="promo2">Watch the video below to discover how Remember works and explore all its features.</p>
     </div>
-    <div class="video-embed" style="max-width: 420px; margin: 0 auto 8px;">
-      <div style="position: relative; width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden;">
-        <iframe
-          id="hero-video"
-          src="https://www.youtube.com/embed/PlOfxdc0Ytc?rel=0&modestbranding=1&enablejsapi=1"
-          title="Remember app overview"
-          style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen
-        ></iframe>
-      </div>
-    </div>
+    <!-- showcase component include -->
+    <div id="showcase-root"></div>
+    <script>
+      (function(){
+        try {
+          fetch('components/showcase.html')
+            .then(function(r){ return r.text(); })
+            .then(function(html){
+              var mount = document.getElementById('showcase-root');
+              if (mount) mount.innerHTML = html;
+            });
+        } catch(e) {}
+      })();
+    </script>
     <div class="socials">
       <p class="socials-title" id="socialsTitle">Our socials</p>
       <div class="social-buttons">
@@ -366,7 +392,14 @@
           '#feature3Title': 'Grow your avatar',
           '#feature3Text': 'Watch your companion evolve as you collect energy and smiles.',
           '#feature4Title': 'Make it yours',
-          '#feature4Text': 'Decorate cozy rooms with monthly collections and rewards.'
+          '#feature4Text': 'Decorate cozy rooms with monthly collections and rewards.',
+          '#showcaseTitle': 'See Remember in action',
+          '#showcaseSubtitle': 'Watch how your companion grows and how easy it is to save memories.',
+          '#screenshot1Caption': 'Write and relive your favorite moments.',
+          '#screenshot2Caption': 'Your evolving companion, full of personality.',
+          '#screenshot3Caption': 'Decorate your cozy home with new collections.',
+          '#screenshot4Caption': 'Daily prompts that spark reflection.',
+          '#screenshot5Caption': 'All memories stay private on your device.'
         },
         ro: {
           '#documentTitle': 'Remember',
@@ -397,7 +430,14 @@
           '#feature3Title': 'Cresteti împreună',
           '#feature3Text': 'Vezi cum companionul tău evoluează pe măsură ce strângi energie și zâmbete.',
           '#feature4Title': 'Fă-l al tău',
-          '#feature4Text': 'Decorează-ți camera cozy cu colecții lunare și recompense.'
+          '#feature4Text': 'Decorează-ți camera cozy cu colecții lunare și recompense.',
+          '#showcaseTitle': 'Vezi Remember în acțiune',
+          '#showcaseSubtitle': 'Urmărește cum crește companionul tău și cât de ușor salvezi amintirile.',
+          '#screenshot1Caption': 'Scrie și retrăiește momentele preferate.',
+          '#screenshot2Caption': 'Companionul tău evoluează și are personalitate.',
+          '#screenshot3Caption': 'Decorează-ți casa cozy cu colecții noi.',
+          '#screenshot4Caption': 'Întrebări zilnice care te fac să reflectezi.',
+          '#screenshot5Caption': 'Toate amintirile rămân private, doar pe dispozitivul tău.'
         },
         es: {
           '#documentTitle': 'Remember',
@@ -428,7 +468,14 @@
           '#feature3Title': 'Haz crecer tu avatar',
           '#feature3Text': 'Mira cómo tu compañero evoluciona al ganar energía y sonrisas.',
           '#feature4Title': 'Hazlo tuyo',
-          '#feature4Text': 'Decora tu habitación acogedora con colecciones mensuales y recompensas.'
+          '#feature4Text': 'Decora tu habitación acogedora con colecciones mensuales y recompensas.',
+          '#showcaseTitle': 'Mira Remember en acción',
+          '#showcaseSubtitle': 'Descubre cómo crece tu compañero y qué fácil es guardar recuerdos.',
+          '#screenshot1Caption': 'Escribe y revive tus momentos favoritos.',
+          '#screenshot2Caption': 'Tu compañero evoluciona y tiene personalidad.',
+          '#screenshot3Caption': 'Decora tu hogar acogedor con nuevas colecciones.',
+          '#screenshot4Caption': 'Preguntas diarias que inspiran reflexión.',
+          '#screenshot5Caption': 'Todos tus recuerdos permanecen privados en tu dispositivo.'
         }
       };
       // Expose translations globally for other scripts (hero interactions)
@@ -465,6 +512,14 @@
         setText('#feature3Text','feature3Text');
         setText('#feature4Title','feature4Title');
         setText('#feature4Text','feature4Text');
+        // Showcase texts
+        setText('#showcaseTitle','showcaseTitle');
+        setText('#showcaseSubtitle','showcaseSubtitle');
+        setText('#screenshot1Caption','screenshot1Caption');
+        setText('#screenshot2Caption','screenshot2Caption');
+        setText('#screenshot3Caption','screenshot3Caption');
+        setText('#screenshot4Caption','screenshot4Caption');
+        setText('#screenshot5Caption','screenshot5Caption');
         // Hero aria-labels
         var foxAnim = document.getElementById('avatarFoxAnim');
         var bearAnim = document.getElementById('avatarBearAnim');
@@ -763,6 +818,42 @@
           }
         });
       });
+      // Screenshots analytics & nav
+      var scroller = document.getElementById('shotsScroller');
+      if (scroller) {
+        var lastScrollFire = 0;
+        scroller.addEventListener('scroll', function(){
+          var now = Date.now();
+          if (now - lastScrollFire > 1000) {
+            lastScrollFire = now;
+            if (typeof gtag === 'function') gtag('event', 'screenshot_swipe');
+          }
+        }, { passive: true });
+        var imgs = scroller.querySelectorAll('.shot-img');
+        for (var i = 0; i < imgs.length; i++){
+          (function(idx){
+            imgs[idx].addEventListener('click', function(){
+              if (typeof gtag === 'function') gtag('event', 'screenshot_click', { index: idx + 1 });
+            });
+          })(i);
+        }
+        var prevBtn = document.getElementById('shotsPrev');
+        var nextBtn = document.getElementById('shotsNext');
+        function snapToNearest(){
+          var w = scroller.getBoundingClientRect().width;
+          var i = Math.round(scroller.scrollLeft / (w + 12));
+          scroller.scrollTo({ left: i * (w + 12), behavior: 'smooth' });
+        }
+        var snapTimer;
+        scroller.addEventListener('scroll', function(){
+          clearTimeout(snapTimer);
+          snapTimer = setTimeout(snapToNearest, 120);
+        }, { passive: true });
+        if (prevBtn && nextBtn){
+          prevBtn.addEventListener('click', function(){ scroller.scrollBy({ left: -(scroller.clientWidth + 12), behavior: 'smooth' }); });
+          nextBtn.addEventListener('click', function(){ scroller.scrollBy({ left: (scroller.clientWidth + 12), behavior: 'smooth' }); });
+        }
+      }
     })();
 
     // YouTube player tracking
