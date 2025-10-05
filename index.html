@@ -106,6 +106,47 @@
     @media (min-width: 768px) {
       .hero-inner { grid-template-columns: 1fr 1fr; align-items: center; }
     }
+    /* Features section */
+    .features {
+      margin: 16px 0 24px;
+      background: linear-gradient(180deg, #fff6db 0%, #fff9e9 100%);
+      padding: 16px;
+      border-radius: 12px;
+    }
+    .features-title {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #444;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      padding: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      cursor: pointer;
+    }
+    .feature-card:focus-visible { outline: 3px solid #3366cc; outline-offset: 2px; }
+    .feature-icon { width: 64px; height: 64px; margin: 4px auto 8px; }
+    .feature-title { font-size: 18px; font-weight: bold; margin: 4px 0 6px; color: #444; }
+    .feature-text { font-size: 15px; margin: 0; color: #555; }
+    @media (min-width: 600px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 992px) {
+      .features-grid { grid-template-columns: repeat(4, 1fr); }
+      .feature-card:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.14); }
+    }
     h1 {
       color: #444;
     }
@@ -223,6 +264,31 @@
         </div>
       </div>
     </section>
+    <section class="features" aria-label="Value proposition">
+      <h2 id="featuresTitle" class="features-title">Why people love Remember</h2>
+      <div class="features-grid">
+        <div id="featureCard1" class="feature-card" role="button" tabindex="0" aria-label="Save memories privately">
+          <img class="feature-icon" src="images/icons/icon_memory.png" alt="" onerror="this.outerHTML='\x3csvg class=feature-icon viewBox=\'0 0 48 48\' xmlns=\'http://www.w3.org/2000/svg\'\x3e\x3ccircle cx=\'24\' cy=\'24\' r=\'22\' fill=\'#ffe08a\'/\x3e\x3c/svg\x3e'">
+          <div id="feature1Title" class="feature-title">Save memories privately</div>
+          <p id="feature1Text" class="feature-text">Capture meaningful moments and photos — only you can see them.</p>
+        </div>
+        <div id="featureCard2" class="feature-card" role="button" tabindex="0" aria-label="Feel-good self-care">
+          <img class="feature-icon" src="images/icons/icon_selfcare.png" alt="" onerror="this.outerHTML='\x3csvg class=feature-icon viewBox=\'0 0 48 48\' xmlns=\'http://www.w3.org/2000/svg\'\x3e\x3crect x=\'6\' y=\'6\' width=\'36\' height=\'36\' rx=\'8\' fill=\'#ffd7a8\'/\x3e\x3c/svg\x3e'">
+          <div id="feature2Title" class="feature-title">Feel-good self-care</div>
+          <p id="feature2Text" class="feature-text">Daily prompts and mood logs that make reflection easy.</p>
+        </div>
+        <div id="featureCard3" class="feature-card" role="button" tabindex="0" aria-label="Grow your avatar">
+          <img class="feature-icon" src="images/icons/icon_growth.png" alt="" onerror="this.outerHTML='\x3csvg class=feature-icon viewBox=\'0 0 48 48\' xmlns=\'http://www.w3.org/2000/svg\'\x3e\x3cpolygon points=\'24,6 42,42 6,42\' fill=\'#ffc36b\'/\x3e\x3c/svg\x3e'">
+          <div id="feature3Title" class="feature-title">Grow your avatar</div>
+          <p id="feature3Text" class="feature-text">Watch your companion evolve as you collect energy and smiles.</p>
+        </div>
+        <div id="featureCard4" class="feature-card" role="button" tabindex="0" aria-label="Make it yours">
+          <img class="feature-icon" src="images/icons/icon_customize.png" alt="" onerror="this.outerHTML='\x3csvg class=feature-icon viewBox=\'0 0 48 48\' xmlns=\'http://www.w3.org/2000/svg\'\x3e\x3cpath d=\'M8 30h32v10H8zM14 8h20v16H14z\' fill=\'#ffb225\'/\x3e\x3c/svg\x3e'">
+          <div id="feature4Title" class="feature-title">Make it yours</div>
+          <p id="feature4Text" class="feature-text">Decorate cozy rooms with monthly collections and rewards.</p>
+        </div>
+      </div>
+    </section>
     <div class="promo">
       <p id="promo1">A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
       <p id="promo2">Watch the video below to discover how Remember works and explore all its features.</p>
@@ -291,7 +357,16 @@
           '#ctaSecondary': 'Watch 30s demo',
           '#avatarFoxAria': 'Fox avatar',
           '#avatarBearAria': 'Bear avatar',
-          '#avatarPenguinAria': 'Penguin avatar'
+          '#avatarPenguinAria': 'Penguin avatar',
+          '#featuresTitle': 'Why people love Remember',
+          '#feature1Title': 'Save memories privately',
+          '#feature1Text': 'Capture meaningful moments and photos — only you can see them.',
+          '#feature2Title': 'Feel-good self-care',
+          '#feature2Text': 'Daily prompts and mood logs that make reflection easy.',
+          '#feature3Title': 'Grow your avatar',
+          '#feature3Text': 'Watch your companion evolve as you collect energy and smiles.',
+          '#feature4Title': 'Make it yours',
+          '#feature4Text': 'Decorate cozy rooms with monthly collections and rewards.'
         },
         ro: {
           '#documentTitle': 'Remember',
@@ -313,7 +388,16 @@
           '#ctaSecondary': 'Vezi demo de 30s',
           '#avatarFoxAria': 'Avatar vulpe',
           '#avatarBearAria': 'Avatar urs',
-          '#avatarPenguinAria': 'Avatar pinguin'
+          '#avatarPenguinAria': 'Avatar pinguin',
+          '#featuresTitle': 'De ce iubesc oamenii Remember',
+          '#feature1Title': 'Salvează amintiri în siguranță',
+          '#feature1Text': 'Surprinde momentele și pozele importante — doar tu le poți vedea.',
+          '#feature2Title': 'Îngrijire de sine plăcută',
+          '#feature2Text': 'Întrebări zilnice și jurnale de stare care fac reflecția ușoară.',
+          '#feature3Title': 'Cresteti împreună',
+          '#feature3Text': 'Vezi cum companionul tău evoluează pe măsură ce strângi energie și zâmbete.',
+          '#feature4Title': 'Fă-l al tău',
+          '#feature4Text': 'Decorează-ți camera cozy cu colecții lunare și recompense.'
         },
         es: {
           '#documentTitle': 'Remember',
@@ -335,7 +419,16 @@
           '#ctaSecondary': 'Ver demo de 30 s',
           '#avatarFoxAria': 'Avatar zorro',
           '#avatarBearAria': 'Avatar oso',
-          '#avatarPenguinAria': 'Avatar pingüino'
+          '#avatarPenguinAria': 'Avatar pingüino',
+          '#featuresTitle': 'Por qué la gente ama Remember',
+          '#feature1Title': 'Guarda recuerdos en privado',
+          '#feature1Text': 'Captura momentos y fotos significativos — solo tú los ves.',
+          '#feature2Title': 'Autocuidado que se siente bien',
+          '#feature2Text': 'Preguntas diarias y registros de ánimo que facilitan la reflexión.',
+          '#feature3Title': 'Haz crecer tu avatar',
+          '#feature3Text': 'Mira cómo tu compañero evoluciona al ganar energía y sonrisas.',
+          '#feature4Title': 'Hazlo tuyo',
+          '#feature4Text': 'Decora tu habitación acogedora con colecciones mensuales y recompensas.'
         }
       };
       // Expose translations globally for other scripts (hero interactions)
@@ -362,6 +455,16 @@
         setText('#heroDefault','heroMsg');
         setText('#ctaPrimary','heroCtaPrimary');
         setText('#ctaSecondary','heroCtaSecondary');
+        // Features texts
+        setText('#featuresTitle','featuresTitle');
+        setText('#feature1Title','feature1Title');
+        setText('#feature1Text','feature1Text');
+        setText('#feature2Title','feature2Title');
+        setText('#feature2Text','feature2Text');
+        setText('#feature3Title','feature3Title');
+        setText('#feature3Text','feature3Text');
+        setText('#feature4Title','feature4Title');
+        setText('#feature4Text','feature4Text');
         // Hero aria-labels
         var foxAnim = document.getElementById('avatarFoxAnim');
         var bearAnim = document.getElementById('avatarBearAnim');
@@ -633,6 +736,30 @@
               link_url: a.href,
               transport_type: 'beacon'
             });
+          }
+        });
+      });
+      // Feature card clicks
+      var featureCards = [
+        { id: 'featureCard1', feature: 'memory' },
+        { id: 'featureCard2', feature: 'selfcare' },
+        { id: 'featureCard3', feature: 'growth' },
+        { id: 'featureCard4', feature: 'customize' }
+      ];
+      featureCards.forEach(function(fc){
+        var el = document.getElementById(fc.id);
+        if (!el) return;
+        el.addEventListener('click', function(){
+          if (typeof gtag === 'function') {
+            gtag('event', 'value_card_click', { feature: fc.feature, transport_type: 'beacon' });
+          }
+        });
+        el.addEventListener('keydown', function(ev){
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            if (typeof gtag === 'function') {
+              gtag('event', 'value_card_click', { feature: fc.feature, transport_type: 'beacon' });
+            }
           }
         });
       });
