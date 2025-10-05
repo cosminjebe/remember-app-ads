@@ -44,30 +44,33 @@
       display: flex;
       gap: 0px;
       justify-content: center;
-      align-items: center;
+      align-items: stretch;
       flex-wrap: nowrap; /* keep avatars on one row */
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       width: 100%;
     }
     .avatar-card {
-      width: 160px;
-  height: 160px;
-  padding: 0px;
-  background: rgba(0,0,0,0.4);
-  /*border-radius: 12px;*/
-  display: flex;
-  align-items: bottom;
-  justify-content: flex-end;
-  cursor: pointer;
-  overflow: hidden;
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+      padding: 0px;
+      background: rgba(0,0,0,0);
+      /*border-radius: 12px;*/
+      display: flex;
+      align-items: flex-end; /* stick content to bottom */
+      justify-content: flex-end;
+      cursor: pointer;
+      overflow: hidden;
+      min-height: 100px; /* keeps a minimum visual presence */
     }
     .avatar-anim { 
       width: 100%;
-  height: 100%;
-  display: block;
-  /* taie 10% din stânga și 10% din dreapta */
-  clip-path: inset(0 10% 0 10%); }
+      height: auto; /* let height shrink so it can sit at the bottom */
+      display: block;
+      align-self: flex-end; /* ensure bottom alignment as a flex item */
+      /* taie 10% din stânga și 10% din dreapta */
+      clip-path: inset(0 10% 0 10%);
+    }
     .avatar-card:focus-visible {
       outline: 3px solid #3366cc;
       outline-offset: 2px;
