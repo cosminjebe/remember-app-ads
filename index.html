@@ -39,23 +39,31 @@
       gap: 16px;
     }
     .avatar-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
       gap: 12px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
     }
     .avatar-card {
-      background: rgba(0,0,0,0);
-      border-radius: 12px;
-     /* box-shadow: 0 2px 8px rgba(0,0,0,0.12);*/
-      padding: 8px;
-      min-height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      overflow: visible;
+      width: 160px;
+  height: 160px;
+  padding: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: visible;
     }
-    .avatar-card svg { transform: scale(3); transform-origin: 50% 50%; }
+    .avatar-anim {  width: 100%;
+  height: 100%;
+  /* scoate asta: transform: scale(0.7); */
+  transform: none;
+  transform-origin: 50% 50%;
+  display: block; /* mai sigur decât inline-block */
+  cursor: pointer; }
     .avatar-card:focus-visible {
       outline: 3px solid #3366cc;
       outline-offset: 2px;
@@ -191,14 +199,14 @@
     <section class="hero" aria-label="Interactive hero">
       <div class="hero-inner">
         <div class="avatar-grid">
-          <div id="avatarFoxCard" class="avatar-card" role="button" tabindex="0" aria-label="Fox avatar">
-            <div id="avatarFoxAnim" style="width: 100%; height: 100%;"></div>
+          <div id="avatarFoxCard" class="avatar-card">
+            <div id="avatarFoxAnim" class="avatar-anim" role="button" tabindex="0" aria-label="Fox avatar"></div>
           </div>
-          <div id="avatarBearCard" class="avatar-card" role="button" tabindex="0" aria-label="Bear avatar">
-            <div id="avatarBearAnim" style="width: 100%; height: 100%;"></div>
+          <div id="avatarBearCard" class="avatar-card">
+            <div id="avatarBearAnim" class="avatar-anim" role="button" tabindex="0" aria-label="Bear avatar"></div>
           </div>
-          <div id="avatarPenguinCard" class="avatar-card" role="button" tabindex="0" aria-label="Penguin avatar">
-            <div id="avatarPenguinAnim" style="width: 100%; height: 100%;"></div>
+          <div id="avatarPenguinCard" class="avatar-card" >
+            <div id="avatarPenguinAnim" class="avatar-anim" role="button" tabindex="0" aria-label="Penguin avatar"></div>
           </div>
         </div>
         <div>
@@ -350,12 +358,12 @@
         setText('#ctaPrimary','heroCtaPrimary');
         setText('#ctaSecondary','heroCtaSecondary');
         // Hero aria-labels
-        var foxCard = document.getElementById('avatarFoxCard');
-        var bearCard = document.getElementById('avatarBearCard');
-        var pengCard = document.getElementById('avatarPenguinCard');
-        if (foxCard && typeof dict['#avatarFoxAria'] === 'string') foxCard.setAttribute('aria-label', dict['#avatarFoxAria']);
-        if (bearCard && typeof dict['#avatarBearAria'] === 'string') bearCard.setAttribute('aria-label', dict['#avatarBearAria']);
-        if (pengCard && typeof dict['#avatarPenguinAria'] === 'string') pengCard.setAttribute('aria-label', dict['#avatarPenguinAria']);
+        var foxAnim = document.getElementById('avatarFoxAnim');
+        var bearAnim = document.getElementById('avatarBearAnim');
+        var pengAnim = document.getElementById('avatarPenguinAnim');
+        if (foxAnim && typeof dict['#avatarFoxAria'] === 'string') foxAnim.setAttribute('aria-label', dict['#avatarFoxAria']);
+        if (bearAnim && typeof dict['#avatarBearAria'] === 'string') bearAnim.setAttribute('aria-label', dict['#avatarBearAria']);
+        if (pengAnim && typeof dict['#avatarPenguinAria'] === 'string') pengAnim.setAttribute('aria-label', dict['#avatarPenguinAria']);
         var aApple = document.getElementById('appleLink');
         var aGoogle = document.getElementById('googleLink');
         if (aApple && typeof dict['#appleAria'] === 'string') aApple.setAttribute('aria-label', dict['#appleAria']);
@@ -415,6 +423,8 @@
           autoplay: true,
           path: assets[name].idle
         });
+        try { players[name].addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); }); } catch(e) {}
+        setTimeout(function(){ updateCardSizeByName(name); }, 50);
       }
       function playTap(name){
         var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
@@ -429,6 +439,8 @@
         });
         players[name] = anim;
         anim.addEventListener('complete', function(){ loadIdle(name); });
+        try { anim.addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); attachSizeObservers(name); }); } catch(e) {}
+        setTimeout(function(){ updateCardSizeByName(name); attachSizeObservers(name); }, 50);
         // Update message
         var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
         var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
@@ -443,14 +455,53 @@
         }
       }
       function addCardHandlers(name){
-        var card = document.getElementById('avatar' + capitalize(name) + 'Card');
-        if (!card) return;
-        card.addEventListener('click', function(){ playTap(name); });
-        card.addEventListener('keydown', function(ev){
+        var animEl = document.getElementById('avatar' + capitalize(name) + 'Anim');
+        if (!animEl) return;
+        animEl.addEventListener('click', function(){ playTap(name); });
+        animEl.addEventListener('keydown', function(ev){
           if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); playTap(name); }
         });
       }
       function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+      function updateCardSizeByName(name){
+        try {
+          var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
+          var card = document.getElementById('avatar' + capitalize(name) + 'Card');
+          if (!container || !card) return;
+          var target = container.querySelector('svg') || container;
+          var rect = target.getBoundingClientRect();
+          if (rect && rect.width && rect.height) {
+            card.style.width = Math.ceil(rect.width) + 'px';
+            card.style.height = Math.ceil(rect.height) + 'px';
+          }
+        } catch(e) {}
+      }
+      function attachSizeObservers(name){
+        try {
+          if (!('ResizeObserver' in window)) return;
+          window.__avatarResizeObservers = window.__avatarResizeObservers || {};
+          var key = name;
+          if (window.__avatarResizeObservers[key]) { try { window.__avatarResizeObservers[key].disconnect(); } catch(e) {} }
+          var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
+          if (!container) return;
+          var ro = new ResizeObserver(function(){ updateCardSizeByName(name); });
+          ro.observe(container);
+          var svg = container.querySelector('svg');
+          if (svg) ro.observe(svg);
+          // Watch for the svg being (re)inserted by lottie
+          var mo = new MutationObserver(function(){
+            try {
+              var s = container.querySelector('svg');
+              if (s) ro.observe(s);
+            } catch(e) {}
+            updateCardSizeByName(name);
+          });
+          mo.observe(container, { childList: true, subtree: true });
+          ro.__mo = mo;
+          window.__avatarResizeObservers[key] = ro;
+        } catch(e) {}
+      }
+      function updateAllCardSizes(){ ['fox','bear','penguin'].forEach(updateCardSizeByName); }
       function initHeroMsg(){
         var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
         var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
@@ -495,6 +546,9 @@
       addCardHandlers('penguin');
       // CTAs
       initCtas();
+      // Initial size adjustment and observers
+      setTimeout(function(){ updateAllCardSizes(); attachSizeObservers('fox'); attachSizeObservers('bear'); attachSizeObservers('penguin'); }, 120);
+      try { window.addEventListener('resize', updateAllCardSizes); } catch(e) {}
       // React to language changes by resetting default message via MutationObserver on <html lang>
       try {
         var mo = new MutationObserver(function(m){ initHeroMsg(); updateCtaLabels(); updateAvatarAria(); });
