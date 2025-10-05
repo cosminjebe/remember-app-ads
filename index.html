@@ -323,6 +323,8 @@
           '#avatarPenguinAria': 'Avatar pingüino'
         }
       };
+      // Expose translations globally for other scripts (hero interactions)
+      try { window.__i18n = translations; } catch(e) {}
 
       function renderI18n(lang){
         var dict = translations[lang] || translations.en;
