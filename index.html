@@ -414,6 +414,7 @@
         penguin: { idle: 'JSONS/avatars/penguinDefault.json', tap: 'JSONS/avatars/penguinTap.json' }
       };
       var players = {};
+      var currentActive = null; // which avatar is currently in TAP loop
       function loadIdle(name){
         var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
         if (!container || !window.lottie) return;
@@ -431,16 +432,26 @@
       function playTap(name){
         var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
         if (!container || !window.lottie) return;
+        // Ensure other avatars go back to idle
+        ['fox','bear','penguin'].forEach(function(other){
+          if (other === name) return;
+          try { if (players[other]) players[other].destroy(); } catch(e) {}
+          loadIdle(other);
+        });
         if (players[name]) { try { players[name].destroy(); } catch(e) {} }
         var anim = lottie.loadAnimation({
           container: container,
           renderer: 'svg',
-          loop: false,
+          loop: !reducedMotion, // tap loops until another avatar is tapped (unless reduced motion)
           autoplay: true,
           path: assets[name].tap
         });
         players[name] = anim;
-        anim.addEventListener('complete', function(){ loadIdle(name); });
+        currentActive = name;
+        if (reducedMotion) {
+          // In reduced motion, do not loop; fall back to idle after one play
+          try { anim.addEventListener('complete', function(){ loadIdle(name); }); } catch(e) {}
+        }
         try { anim.addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); attachSizeObservers(name); }); } catch(e) {}
         setTimeout(function(){ updateCardSizeByName(name); attachSizeObservers(name); }, 50);
         // Update message
