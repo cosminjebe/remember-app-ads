@@ -31,6 +31,64 @@
       font-size: 14px;
       padding: 4px 8px;
     }
+    .hero {
+      margin: 16px 0 24px;
+    }
+    .hero-inner {
+      display: grid;
+      gap: 16px;
+    }
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .avatar-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      padding: 8px;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .avatar-card:focus-visible {
+      outline: 3px solid #3366cc;
+      outline-offset: 2px;
+    }
+    .message-box {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      padding: 12px 14px;
+      text-align: left;
+      min-height: 4.5em;
+    }
+    .hero-ctas {
+      margin-top: 12px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .hero-ctas .btn {
+      font-size: 16px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    .hero-ctas .btn:focus-visible {
+      outline: 3px solid #3366cc;
+      outline-offset: 2px;
+    }
+    .btn-primary { background: #3366cc; color: #fff; }
+    .btn-secondary { background: #eeeeee; color: #333; }
+    @media (min-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr 1fr; align-items: center; }
+    }
     h1 {
       color: #444;
     }
@@ -128,6 +186,28 @@
         <img src="images/downloadGoogle.webp" alt="Get it on Google Play" class="store-badge" />
       </a>
     </div>
+    <section class="hero" aria-label="Interactive hero">
+      <div class="hero-inner">
+        <div class="avatar-grid">
+          <div id="avatarFoxCard" class="avatar-card" role="button" tabindex="0" aria-label="Fox avatar">
+            <div id="avatarFoxAnim" style="width: 100%; height: 100%;"></div>
+          </div>
+          <div id="avatarBearCard" class="avatar-card" role="button" tabindex="0" aria-label="Bear avatar">
+            <div id="avatarBearAnim" style="width: 100%; height: 100%;"></div>
+          </div>
+          <div id="avatarPenguinCard" class="avatar-card" role="button" tabindex="0" aria-label="Penguin avatar">
+            <div id="avatarPenguinAnim" style="width: 100%; height: 100%;"></div>
+          </div>
+        </div>
+        <div>
+          <div id="heroMsg" class="message-box" aria-live="polite"></div>
+          <div class="hero-ctas">
+            <button id="heroCtaPrimary" class="btn btn-primary" aria-label="Get the app"></button>
+            <button id="heroCtaSecondary" class="btn btn-secondary" aria-label="Watch 30s demo"></button>
+          </div>
+        </div>
+      </div>
+    </section>
     <div class="promo">
       <p id="promo1">A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
       <p id="promo2">Watch the video below to discover how Remember works and explore all its features.</p>
@@ -170,6 +250,8 @@
     </div>
   </div>
 
+  <link rel="preload" href="JSONS/avatars/foxDefault.json" as="fetch" />
+
   <!-- I18N -->
   <script>
     (function(){
@@ -185,7 +267,16 @@
           '#footerPrivacy': 'Privacy Policy',
           '#appleAria': 'Download on the App Store',
           '#googleAria': 'Get it on Google Play',
-          '#ytTitle': 'Remember app overview'
+          '#ytTitle': 'Remember app overview',
+          '#heroDefault': 'Tap on any of our avatars to find out more about Remember.',
+          '#foxMsg': 'Remember is your journal for moments that truly matter. Write, add photos, and I\u2019ll bring them back when you need a smile.',
+          '#bearMsg': 'Make daily self-care effortless: short prompts, streaks, and light rewards. Show up for yourself\u2014without pressure.',
+          '#penguinMsg': 'We grow together: 5 life stages, cozy room decor, monthly collections, and feel-good surprises.',
+          '#ctaPrimary': 'Get the app',
+          '#ctaSecondary': 'Watch 30s demo',
+          '#avatarFoxAria': 'Fox avatar',
+          '#avatarBearAria': 'Bear avatar',
+          '#avatarPenguinAria': 'Penguin avatar'
         },
         ro: {
           '#documentTitle': 'Remember',
@@ -198,7 +289,16 @@
           '#footerPrivacy': 'Politica de confidențialitate',
           '#appleAria': 'Descarcă din App Store',
           '#googleAria': 'Ia-l de pe Google Play',
-          '#ytTitle': 'Prezentare generală a aplicației Remember'
+          '#ytTitle': 'Prezentare generală a aplicației Remember',
+          '#heroDefault': 'Atinge oricare dintre avatare ca să afli mai multe despre Remember.',
+          '#foxMsg': 'Remember e jurnalul tău pentru momente care chiar contează. Scrii, atașezi poze și ți le aduc înapoi când ai nevoie de un zâmbet.',
+          '#bearMsg': 'Ai grijă de tine mai ușor: întrebări scurte, streaks și recompense lejere. Fă un bine pentru tine\u2014fără presiune.',
+          '#penguinMsg': 'Crestem împreună: 5 etape de viață, casă cozy, colecții lunare și surprize care te binedispun.',
+          '#ctaPrimary': 'Descarcă aplicația',
+          '#ctaSecondary': 'Vezi demo de 30s',
+          '#avatarFoxAria': 'Avatar vulpe',
+          '#avatarBearAria': 'Avatar urs',
+          '#avatarPenguinAria': 'Avatar pinguin'
         },
         es: {
           '#documentTitle': 'Remember',
@@ -211,7 +311,16 @@
           '#footerPrivacy': 'Política de privacidad',
           '#appleAria': 'Descargar en el App Store',
           '#googleAria': 'Consíguelo en Google Play',
-          '#ytTitle': 'Descripción general de la app Remember'
+          '#ytTitle': 'Descripción general de la app Remember',
+          '#heroDefault': 'Toca cualquiera de nuestros avatares para saber más sobre Remember.',
+          '#foxMsg': 'Remember es tu diario para los momentos que realmente importan. Escribe, añade fotos y te los devolveré cuando necesites una sonrisa.',
+          '#bearMsg': 'Haz que el autocuidado diario sea fácil: preguntas cortas, rachas y recompensas ligeras. Preséntate por ti\u2014sin presión.',
+          '#penguinMsg': 'Crecemos juntos: 5 etapas de vida, hogar acogedor, colecciones mensuales y sorpresas que te hacen sentir bien.',
+          '#ctaPrimary': 'Descargar la app',
+          '#ctaSecondary': 'Ver demo de 30 s',
+          '#avatarFoxAria': 'Avatar zorro',
+          '#avatarBearAria': 'Avatar oso',
+          '#avatarPenguinAria': 'Avatar pingüino'
         }
       };
 
@@ -232,6 +341,17 @@
         setText('#socialsTitle','socialsTitle');
         setText('#footerSupport','footerSupport');
         setText('#footerPrivacy','footerPrivacy');
+        // Hero texts
+        setText('#heroDefault','heroMsg');
+        setText('#ctaPrimary','heroCtaPrimary');
+        setText('#ctaSecondary','heroCtaSecondary');
+        // Hero aria-labels
+        var foxCard = document.getElementById('avatarFoxCard');
+        var bearCard = document.getElementById('avatarBearCard');
+        var pengCard = document.getElementById('avatarPenguinCard');
+        if (foxCard && typeof dict['#avatarFoxAria'] === 'string') foxCard.setAttribute('aria-label', dict['#avatarFoxAria']);
+        if (bearCard && typeof dict['#avatarBearAria'] === 'string') bearCard.setAttribute('aria-label', dict['#avatarBearAria']);
+        if (pengCard && typeof dict['#avatarPenguinAria'] === 'string') pengCard.setAttribute('aria-label', dict['#avatarPenguinAria']);
         var aApple = document.getElementById('appleLink');
         var aGoogle = document.getElementById('googleLink');
         if (aApple && typeof dict['#appleAria'] === 'string') aApple.setAttribute('aria-label', dict['#appleAria']);
@@ -263,6 +383,140 @@
           });
         }
       })();
+    })();
+  </script>
+
+  <!-- Lottie -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+
+  <!-- Hero logic -->
+  <script>
+    (function(){
+      var reducedMotion = false;
+      try { reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e) {}
+      var assets = {
+        fox: { idle: 'JSONS/avatars/foxDefault.json', tap: 'JSONS/avatars/foxTap.json' },
+        bear: { idle: 'JSONS/avatars/bearDefault.json', tap: 'JSONS/avatars/bearTap.json' },
+        penguin: { idle: 'JSONS/avatars/penguinDefault.json', tap: 'JSONS/avatars/penguinTap.json' }
+      };
+      var players = {};
+      function loadIdle(name){
+        var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
+        if (!container || !window.lottie) return;
+        if (players[name]) { try { players[name].destroy(); } catch(e) {} }
+        players[name] = lottie.loadAnimation({
+          container: container,
+          renderer: 'svg',
+          loop: !reducedMotion,
+          autoplay: true,
+          path: assets[name].idle
+        });
+      }
+      function playTap(name){
+        var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
+        if (!container || !window.lottie) return;
+        if (players[name]) { try { players[name].destroy(); } catch(e) {} }
+        var anim = lottie.loadAnimation({
+          container: container,
+          renderer: 'svg',
+          loop: false,
+          autoplay: true,
+          path: assets[name].tap
+        });
+        players[name] = anim;
+        anim.addEventListener('complete', function(){ loadIdle(name); });
+        // Update message
+        var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+        var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+        var msgEl = document.getElementById('heroMsg');
+        if (msgEl) {
+          var key = name === 'fox' ? '#foxMsg' : (name === 'bear' ? '#bearMsg' : '#penguinMsg');
+          var text = dict[key];
+          if (typeof text === 'string') msgEl.textContent = text;
+        }
+        if (typeof gtag === 'function') {
+          gtag('event', 'avatar_tap', { character: name, transport_type: 'beacon' });
+        }
+      }
+      function addCardHandlers(name){
+        var card = document.getElementById('avatar' + capitalize(name) + 'Card');
+        if (!card) return;
+        card.addEventListener('click', function(){ playTap(name); });
+        card.addEventListener('keydown', function(ev){
+          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); playTap(name); }
+        });
+      }
+      function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+      function initHeroMsg(){
+        var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+        var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+        var msgEl = document.getElementById('heroMsg');
+        if (msgEl && dict && typeof dict['#heroDefault'] === 'string') {
+          msgEl.textContent = dict['#heroDefault'];
+        }
+      }
+      function initCtas(){
+        var primary = document.getElementById('heroCtaPrimary');
+        var secondary = document.getElementById('heroCtaSecondary');
+        if (primary) {
+          primary.addEventListener('click', function(){
+            var ua = (navigator.userAgent || '').toLowerCase();
+            var appleHref = (document.getElementById('appleLink') || {}).href;
+            var googleHref = (document.getElementById('googleLink') || {}).href;
+            var target = /android/i.test(ua) ? googleHref : appleHref || googleHref;
+            if (typeof gtag === 'function') { gtag('event', 'cta_click', { location: 'hero', type: 'primary' }); }
+            if (target) { window.location.href = target; }
+          });
+        }
+        if (secondary) {
+          secondary.addEventListener('click', function(){
+            if (typeof gtag === 'function') { gtag('event', 'cta_click', { location: 'hero', type: 'secondary' }); }
+            var v = document.getElementById('hero-video');
+            if (v && typeof v.scrollIntoView === 'function') { v.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+          });
+        }
+      }
+      // Expose translations for hero access
+      try { window.__i18n = (window.__i18n || {}); var t = (function(){ return (function(){ var s=document.currentScript; while(s && s.tagName!== 'SCRIPT') s=s.previousSibling; return s; })(); })(); } catch(e) {}
+      // Copy translations object reference for hero use
+      try { window.__i18n = Object.assign({}, window.__i18n, (function(){ var scr = document.querySelector('script:nth-of-type(2)'); return window.__i18n; })()); } catch(e) {}
+      // During i18n init, we already set hero default text; ensure again here
+      initHeroMsg();
+      // Init avatars
+      loadIdle('fox');
+      loadIdle('bear');
+      loadIdle('penguin');
+      addCardHandlers('fox');
+      addCardHandlers('bear');
+      addCardHandlers('penguin');
+      // CTAs
+      initCtas();
+      // React to language changes by resetting default message via MutationObserver on <html lang>
+      try {
+        var mo = new MutationObserver(function(m){ initHeroMsg(); updateCtaLabels(); updateAvatarAria(); });
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+      } catch(e) {}
+      function updateCtaLabels(){
+        var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+        var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+        var p = document.getElementById('heroCtaPrimary');
+        var s = document.getElementById('heroCtaSecondary');
+        if (p && typeof dict['#ctaPrimary'] === 'string') { p.textContent = dict['#ctaPrimary']; p.setAttribute('aria-label', dict['#ctaPrimary']); }
+        if (s && typeof dict['#ctaSecondary'] === 'string') { s.textContent = dict['#ctaSecondary']; s.setAttribute('aria-label', dict['#ctaSecondary']); }
+      }
+      function updateAvatarAria(){
+        var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+        var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+        var f = document.getElementById('avatarFoxCard');
+        var b = document.getElementById('avatarBearCard');
+        var p = document.getElementById('avatarPenguinCard');
+        if (f && typeof dict['#avatarFoxAria'] === 'string') f.setAttribute('aria-label', dict['#avatarFoxAria']);
+        if (b && typeof dict['#avatarBearAria'] === 'string') b.setAttribute('aria-label', dict['#avatarBearAria']);
+        if (p && typeof dict['#avatarPenguinAria'] === 'string') p.setAttribute('aria-label', dict['#avatarPenguinAria']);
+      }
+      // Initial labels
+      updateCtaLabels();
+      updateAvatarAria();
     })();
   </script>
 
