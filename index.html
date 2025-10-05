@@ -35,7 +35,9 @@
       margin: 16px 0 24px;
     }
     .hero-inner {
-      display: grid;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 16px;
     }
     .avatar-grid {
@@ -43,7 +45,10 @@
       gap: 12px;
       justify-content: center;
       align-items: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap; /* keep avatars on one row */
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
     }
     .avatar-card {
       width: 160px;
@@ -197,6 +202,7 @@
     </div>
     <section class="hero" aria-label="Interactive hero">
       <div class="hero-inner">
+        <div id="heroMsg" class="message-box" aria-live="polite"></div>
         <div class="avatar-grid">
           <div id="avatarFoxCard" class="avatar-card">
             <div id="avatarFoxAnim" class="avatar-anim" role="button" tabindex="0" aria-label="Fox avatar"></div>
@@ -204,16 +210,13 @@
           <div id="avatarBearCard" class="avatar-card">
             <div id="avatarBearAnim" class="avatar-anim" role="button" tabindex="0" aria-label="Bear avatar"></div>
           </div>
-          <div id="avatarPenguinCard" class="avatar-card" >
+          <div id="avatarPenguinCard" class="avatar-card">
             <div id="avatarPenguinAnim" class="avatar-anim" role="button" tabindex="0" aria-label="Penguin avatar"></div>
           </div>
         </div>
-        <div>
-          <div id="heroMsg" class="message-box" aria-live="polite"></div>
-          <div class="hero-ctas">
-            <button id="heroCtaPrimary" class="btn btn-primary" aria-label="Get the app"></button>
-            <button id="heroCtaSecondary" class="btn btn-secondary" aria-label="Watch 30s demo"></button>
-          </div>
+        <div class="hero-ctas">
+          <button id="heroCtaPrimary" class="btn btn-primary" aria-label="Get the app"></button>
+          <button id="heroCtaSecondary" class="btn btn-secondary" aria-label="Watch 30s demo"></button>
         </div>
       </div>
     </section>
