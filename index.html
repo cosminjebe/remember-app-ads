@@ -145,6 +145,22 @@
       font-weight: bold;
       color: #444;
     }
+    /* Privacy strip */
+    .privacy-strip { margin: 16px 0; background: #fff8e6; border-radius: 12px; padding: 16px; }
+    .privacy-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+    .privacy-title { margin: 0 0 6px; font-size: 18px; color: #444; }
+    .privacy-line { margin: 2px 0; font-size: 15px; color: #555; }
+    .privacy-cta { display: inline-block; margin-top: 8px; color: #3366cc; text-decoration: underline; }
+    .privacy-cta:focus-visible { outline: 3px solid #3366cc; outline-offset: 2px; }
+    @media (min-width: 992px) { .privacy-inner { text-align: left; } }
+    /* FAQ */
+    .faq { margin: 16px 0 24px; }
+    .faq-title { text-align: center; margin: 0 0 8px; font-size: 20px; color: #444; }
+    .faq-list { max-width: 800px; margin: 0 auto; display: grid; gap: 8px; }
+    .faq-item { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); overflow: hidden; }
+    .faq-q { list-style: none; padding: 12px 14px; cursor: pointer; font-size: 16px; }
+    .faq-a-wrap { padding: 0 14px 12px; }
+    .faq-a { margin: 0; font-size: 15px; color: #555; }
     .features-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -319,6 +335,17 @@
       <p id="promo1">A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
       <p id="promo2">Watch the video below to discover how Remember works and explore all its features.</p>
     </div>
+    <!-- privacy + faq component include -->
+    <div id="privacy-faq-root"></div>
+    <script>
+      (function(){
+        try {
+          fetch('components/privacy_faq.html')
+            .then(function(r){ return r.text(); })
+            .then(function(html){ var mount = document.getElementById('privacy-faq-root'); if (mount) mount.innerHTML = html; });
+        } catch(e) {}
+      })();
+    </script>
     <!-- showcase component include -->
     <div id="showcase-root"></div>
     <script>
@@ -400,6 +427,21 @@
           '#screenshot3Caption': 'Decorate your cozy home with new collections.',
           '#screenshot4Caption': 'Daily prompts that spark reflection.',
           '#screenshot5Caption': 'All memories stay private on your device.'
+          , '#privacyStripTitle': 'Privacy & Backups'
+          , '#privacyStripLine1': 'Private by design. 100% on your device.'
+          , '#privacyStripLine2': 'No cloud storage. No tracking. Manual JSON backup/restore.'
+          , '#privacyStripCta': 'Learn more'
+          , '#faqTitle': 'FAQ'
+          , '#faqQ1': 'Are my memories private?'
+          , '#faqA1': 'Yes. Everything is stored locally on your device. We do not collect or track your content.'
+          , '#faqQ2': 'What is a Wholesome Memory?'
+          , '#faqA2': 'A daily highlight you can mark; your avatar can resurface it in surprise moments.'
+          , '#faqQ3': 'How does the avatar grow?'
+          , '#faqA3': 'By collecting Energy through light engagement and milestones. It evolves across 5 life stages.'
+          , '#faqQ4': 'Are there ads?'
+          , '#faqA4': 'No intrusive ads. Watching ads is optional and only gives bonus rewards.'
+          , '#faqQ5': 'Can I switch phones?'
+          , '#faqA5': 'Yes. Use manual JSON backup/restore from Settings to move your memories and progress.'
         },
         ro: {
           '#documentTitle': 'Remember',
@@ -438,6 +480,21 @@
           '#screenshot3Caption': 'Decorează-ți casa cozy cu colecții noi.',
           '#screenshot4Caption': 'Întrebări zilnice care te fac să reflectezi.',
           '#screenshot5Caption': 'Toate amintirile rămân private, doar pe dispozitivul tău.'
+          , '#privacyStripTitle': 'Confidențialitate & Backup'
+          , '#privacyStripLine1': 'Gândit pentru intimitate. 100% pe dispozitivul tău.'
+          , '#privacyStripLine2': 'Fără cloud. Fără tracking. Backup/restore manual JSON.'
+          , '#privacyStripCta': 'Află mai multe'
+          , '#faqTitle': 'Întrebări frecvente'
+          , '#faqQ1': 'Amintirile mele sunt private?'
+          , '#faqA1': 'Da. Totul este stocat local pe dispozitivul tău. Nu colectăm și nu urmărim conținutul tău.'
+          , '#faqQ2': 'Ce este o ‘Wholesome Memory’?'
+          , '#faqA2': 'Un highlight zilnic pe care îl marchezi; avatarul ți-l poate readuce în momente-surpriză.'
+          , '#faqQ3': 'Cum crește avatarul?'
+          , '#faqA3': 'Prin energie obținută din interacțiuni ușoare și milestone-uri. Evoluează în 5 etape.'
+          , '#faqQ4': 'Există reclame?'
+          , '#faqA4': 'Fără reclame intruzive. Vizionarea este opțională și oferă doar recompense bonus.'
+          , '#faqQ5': 'Pot să schimb telefonul?'
+          , '#faqA5': 'Da. Folosește backup/restore manual JSON din Setări pentru a muta amintirile și progresul.'
         },
         es: {
           '#documentTitle': 'Remember',
@@ -476,6 +533,21 @@
           '#screenshot3Caption': 'Decora tu hogar acogedor con nuevas colecciones.',
           '#screenshot4Caption': 'Preguntas diarias que inspiran reflexión.',
           '#screenshot5Caption': 'Todos tus recuerdos permanecen privados en tu dispositivo.'
+          , '#privacyStripTitle': 'Privacidad y copias de seguridad'
+          , '#privacyStripLine1': 'Privado por diseño. 100% en tu dispositivo.'
+          , '#privacyStripLine2': 'Sin nube. Sin rastreo. Copia/restore manual en JSON.'
+          , '#privacyStripCta': 'Saber más'
+          , '#faqTitle': 'Preguntas frecuentes'
+          , '#faqQ1': '¿Mis recuerdos son privados?'
+          , '#faqA1': 'Sí. Todo se guarda localmente en tu dispositivo. No recopilamos ni rastreamos tu contenido.'
+          , '#faqQ2': '¿Qué es un ‘Wholesome Memory’?'
+          , '#faqA2': 'Un destacado diario que marcas; tu avatar puede volver a mostrártelo en momentos sorpresa.'
+          , '#faqQ3': '¿Cómo crece el avatar?'
+          , '#faqA3': 'Al ganar Energía mediante pequeñas interacciones y logros. Evoluciona en 5 etapas.'
+          , '#faqQ4': '¿Hay anuncios?'
+          , '#faqA4': 'Sin anuncios intrusivos. Ver anuncios es opcional y solo da recompensas extra.'
+          , '#faqQ5': '¿Puedo cambiar de teléfono?'
+          , '#faqA5': 'Sí. Usa la copia/restore manual JSON desde Ajustes para mover recuerdos y progreso.'
         }
       };
       // Expose translations globally for other scripts (hero interactions)
@@ -520,6 +592,17 @@
         setText('#screenshot3Caption','screenshot3Caption');
         setText('#screenshot4Caption','screenshot4Caption');
         setText('#screenshot5Caption','screenshot5Caption');
+        // Privacy strip + FAQ texts
+        setText('#privacyStripTitle','privacyStripTitle');
+        setText('#privacyStripLine1','privacyStripLine1');
+        setText('#privacyStripLine2','privacyStripLine2');
+        setText('#privacyStripCta','privacyStripCta');
+        setText('#faqTitle','faqTitle');
+        setText('#faqQ1','faqQ1'); setText('#faqA1','faqA1');
+        setText('#faqQ2','faqQ2'); setText('#faqA2','faqA2');
+        setText('#faqQ3','faqQ3'); setText('#faqA3','faqA3');
+        setText('#faqQ4','faqQ4'); setText('#faqA4','faqA4');
+        setText('#faqQ5','faqQ5'); setText('#faqA5','faqA5');
         // Hero aria-labels
         var foxAnim = document.getElementById('avatarFoxAnim');
         var bearAnim = document.getElementById('avatarBearAnim');
@@ -818,6 +901,22 @@
           }
         });
       });
+      // FAQ analytics and smooth scroll
+      try {
+        document.querySelectorAll('.faq-item').forEach(function(d){
+          d.addEventListener('toggle', function(){
+            if (d.open && typeof gtag === 'function') {
+              var q = d.querySelector('summary');
+              var id = q ? q.id : 'unknown';
+              gtag('event', 'faq_open', { question: id });
+            }
+          });
+        });
+      } catch(e) {}
+      try {
+        var cta = document.getElementById('privacyStripCtaLink');
+        if (cta) cta.addEventListener('click', function(ev){ ev.preventDefault(); var target = document.getElementById('faq'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      } catch(e) {}
       // Screenshots analytics & nav
       var scroller = document.getElementById('shotsScroller');
       if (scroller) {
