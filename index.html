@@ -133,13 +133,33 @@
     .shot-img { width: 100%; height: auto; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: transform .2s ease, filter .2s ease; display: block; }
     .shot-img:hover { transform: translateY(-3px); filter: brightness(1.03); }
     .shot-cap { font-size: 13px; color: #555; margin: 6px 0 0; text-align: center; }
-    .shots-nav { display: none; }
+    /* Mobile: overlay arrows aligned to the scroller width */
+    .shots-nav { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: var(--shot-width); pointer-events: none; }
+    .shots-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .shots-btn:focus-visible { outline: 3px solid #3366cc; outline-offset: 2px; }
+    #shotsPrev { left: -6px; }
+    #shotsNext { right: -6px; }
     @media (min-width: 992px) {
-      .showcase-inner { grid-template-columns: 1fr 1fr; align-items: start; }
+      /* Desktop: 3 fixed-width columns, no scroller */
+      .showcase-inner { grid-template-columns: repeat(3, var(--shot-width)); justify-content: center; align-items: start; }
       .showcase-title, .showcase-subtitle { text-align: left; }
-      .shots-nav { display: flex; gap: 8px; justify-content: flex-end; margin: 6px 0; }
-      .shots-btn { border: none; background: #eeeeee; color: #333; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
-      .shots-btn:focus-visible { outline: 3px solid #3366cc; outline-offset: 2px; }
+      .shots-nav { display: none; }
+      .screenshots { display: contents; }
+      .shots-scroller { display: contents; overflow: visible; padding-bottom: 0; width: auto; margin: 0; scroll-snap-type: none; }
+      .shot { width: var(--shot-width); }
       /* Make video as big as a screenshot card on desktop */
       .showcase-video { display: flex; justify-content: center; }
       .showcase-video .video-wrapper { width: var(--shot-width); }
