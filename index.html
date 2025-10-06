@@ -38,7 +38,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      /*gap: 16px;*/
     }
     .avatar-grid {
       display: flex;
@@ -54,7 +54,7 @@
       flex: 0 0 33.3333%;
       max-width: 33.3333%;
       padding: 0px;
-      background: rgba(0,0,0,0);
+      background: rgba(194, 143, 2, 0);
       /*border-radius: 12px;*/
       display: flex;
       align-items: flex-end; /* stick content to bottom */
@@ -63,6 +63,7 @@
       overflow: hidden;
       min-height: 100px; /* keeps a minimum visual presence */
     }
+    .avatar-card.is-active { background: rgb(255, 255, 255, 0); /*box-shadow: 0 2px 8px rgba(0,0,0,0.12); */}
     .avatar-anim { 
       width: 100%;
       height: auto; /* let height shrink so it can sit at the bottom */
@@ -82,8 +83,8 @@
       outline-offset: 2px;
     }
     .message-box {
-      background: #fff;
-      border-radius: 12px;
+      background: linear-gradient(180deg, #fff6db 0%, #fff9e9 100%);
+      /*border-radius: 12px;*/
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
       padding: 12px 14px;
       text-align: center;
@@ -91,6 +92,7 @@
       align-items: center;
       justify-content: center;
       min-height: 4.5em;
+      width: 100%;
     }
     .hero-ctas {
       margin-top: 12px;
@@ -265,6 +267,13 @@
         padding: 20px;
       }
     }
+    /* Speech balloon overlay */
+    .speech-balloon { position: absolute; z-index: 10; pointer-events: none; opacity: 0; transform: translateY(6px); transition: opacity .22s ease, transform .22s ease; max-height: 260px; }
+    .speech-balloon.is-visible { opacity: 1; transform: translateY(0); }
+    .speech-balloon-img { display: block; width: 100%; height: auto; }
+    .speech-balloon-text { position: absolute; top: 7%; left: 7%; right: 7%; bottom: 15%; display: flex; align-items: center; justify-content: center; text-align: center; color: #333; font-size: 14px; line-height: 1.35; padding: 0 2px; }
+    /* Flip only the balloon image for penguin */
+    .speech-balloon.is-flipped .speech-balloon-img { transform: scaleX(-1); }
   </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-7M424SWMFB"></script>
@@ -418,7 +427,7 @@
           '#ytTitle': 'Remember app overview',
           '#heroDefault': 'Tap on any of our avatars to find out more about Remember.',
           '#foxMsg': 'Remember is your journal for moments that truly matter. Write, add photos, and I\u2019ll bring them back when you need a smile.',
-          '#bearMsg': 'Remember helps you feel better by recalling what makes you happy. Studies show that revisiting positive memories reduces stress and builds emotional resilience.',
+          '#bearMsg': 'Remember helps you feel better by recalling what makes you happy. Research shows that positive memories reduce stress and build resilience.',
           '#penguinMsg': 'We grow together: 5 life stages, cozy room decor, monthly collections, and feel-good surprises.',
           '#ctaPrimary': 'Get the app',
           '#ctaSecondary': 'Watch 30s demo',
@@ -471,7 +480,7 @@
           '#ytTitle': 'Prezentare generală a aplicației Remember',
           '#heroDefault': 'Atinge oricare dintre avatare ca să afli mai multe despre Remember.',
           '#foxMsg': 'Remember e jurnalul tău pentru momente care chiar contează. Scrii, atașezi poze și ți le aduc înapoi când ai nevoie de un zâmbet.',
-          '#bearMsg': 'Remember te ajută să te simți mai bine, amintindu-ți lucrurile care te fac fericit. Studiile arată că rememorarea momentelor pozitive reduce stresul și crește reziliența emoțională.',
+          '#bearMsg': 'Remember te ajută să te simți mai bine, amintindu-ți lucrurile care te fac fericit. Cercetările arată că amintirile pozitive reduc stresul și sporesc reziliența emoțională.',
           '#penguinMsg': 'Crestem împreună: 5 etape de viață, casă cozy, colecții lunare și surprize care te binedispun.',
           '#ctaPrimary': 'Descarcă aplicația',
           '#ctaSecondary': 'Vezi demo de 30s',
@@ -524,7 +533,7 @@
           '#ytTitle': 'Descripción general de la app Remember',
           '#heroDefault': 'Toca cualquiera de nuestros avatares para saber más sobre Remember.',
           '#foxMsg': 'Remember es tu diario para los momentos que realmente importan. Escribe, añade fotos y te los devolveré cuando necesites una sonrisa.',
-          '#bearMsg': 'Haz que el autocuidado diario sea fácil: preguntas cortas, rachas y recompensas ligeras. Preséntate por ti\u2014sin presión.',
+          '#bearMsg': 'Remember te ayuda a sentirte mejor al recordar lo que te hace feliz. Las investigaciones demuestran que los recuerdos positivos reducen el estrés y fortalecen la resiliencia emocional.',
           '#penguinMsg': 'Crecemos juntos: 5 etapas de vida, hogar acogedor, colecciones mensuales y sorpresas que te hacen sentir bien.',
           '#ctaPrimary': 'Descargar la app',
           '#ctaSecondary': 'Ver demo de 30 s',
@@ -674,6 +683,146 @@
       var players = {};
       var states = { fox: 'idle', bear: 'idle', penguin: 'idle' };
       var currentActive = null; // which avatar is currently in TAP loop
+      // Speech balloon state
+      var balloonEl = null; // root element
+      var balloonTextEl = null;
+      var balloonVisibleFor = null; // avatar name when visible
+      var hasDismissedHeroMsg = false; // hide message-box after first tap
+      var BALLOON_IMG_SRC = 'images/dialogueBaloon.webp';
+      var BALLOON_FADE_MS = 220;
+      var BALLOON_MAX_H = 260; // keep in sync with CSS max-height
+
+      function ensureBalloon(){
+        if (balloonEl) return balloonEl;
+        var el = document.createElement('div');
+        el.className = 'speech-balloon';
+        var img = new Image();
+        img.src = BALLOON_IMG_SRC;
+        img.alt = '';
+        img.className = 'speech-balloon-img';
+        var txt = document.createElement('div');
+        txt.className = 'speech-balloon-text';
+        el.appendChild(img);
+        el.appendChild(txt);
+        document.body.appendChild(el);
+        balloonEl = el;
+        balloonTextEl = txt;
+        // Capture aspect ratio and reposition after image loads
+        img.addEventListener('load', function(){
+          try { el.__balloonAR = (img.naturalWidth && img.naturalHeight) ? (img.naturalWidth / img.naturalHeight) : 1.45; } catch(e) { el.__balloonAR = 1.45; }
+          if (balloonVisibleFor) { sizeBalloonForText(balloonVisibleFor); positionBalloonOver(balloonVisibleFor); }
+        });
+        return el;
+      }
+      function getBalloonAspectRatio(){
+        ensureBalloon();
+        return balloonEl && balloonEl.__balloonAR ? balloonEl.__balloonAR : 1.45;
+      }
+      function getAvatarMsg(name){
+        var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+        var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+        var key = name === 'fox' ? '#foxMsg' : (name === 'bear' ? '#bearMsg' : '#penguinMsg');
+        var text = dict[key];
+        return (typeof text === 'string') ? text : '';
+      }
+      function hideHeroMsgWithFade(){
+        if (hasDismissedHeroMsg) return;
+        var msgEl = document.getElementById('heroMsg');
+        if (!msgEl) { hasDismissedHeroMsg = true; return; }
+        try {
+          msgEl.style.transition = 'opacity .22s ease';
+          msgEl.style.opacity = '0';
+          // Keep space reserved; do not collapse the box
+          msgEl.setAttribute('aria-hidden', 'true');
+        } catch(e) {}
+        hasDismissedHeroMsg = true;
+      }
+      function positionBalloonOver(name){
+        if (!balloonEl) return;
+        try {
+          var card = document.getElementById('avatar' + capitalize(name) + 'Card');
+          if (!card) return;
+          var r = card.getBoundingClientRect();
+          var width = balloonEl.offsetWidth || 220;
+          var estH = balloonEl.offsetHeight || Math.round(width / getBalloonAspectRatio());
+          var left = Math.round(window.scrollX + r.left + (r.width - width) / 2);
+          var top = Math.round(window.scrollY + r.top - estH + 8);
+          // Keep within container horizontally
+          var cont = document.querySelector('.container');
+          if (cont) {
+            var cr = cont.getBoundingClientRect();
+            var minLeft = Math.round(window.scrollX + cr.left + 4);
+            var maxLeft = Math.round(window.scrollX + cr.right - width - 4);
+            if (left < minLeft) left = minLeft;
+            if (left > maxLeft) left = maxLeft;
+          }
+          balloonEl.style.left = left + 'px';
+          balloonEl.style.top = top + 'px';
+        } catch(e) {}
+      }
+      function sizeBalloonForText(name){
+        ensureBalloon();
+        var card = document.getElementById('avatar' + capitalize(name) + 'Card');
+        if (!balloonEl || !balloonTextEl || !card) return;
+        var ar = getBalloonAspectRatio();
+        var cardRect = card.getBoundingClientRect();
+        var baseW = Math.max(180, cardRect.width * 1.1);
+        var cont = document.querySelector('.container');
+        var contW = cont ? cont.getBoundingClientRect().width : (window.innerWidth - 20);
+        var maxWFromCap = BALLOON_MAX_H * ar;
+        var maxWViewport = Math.max(200, Math.min(contW - 8, window.innerWidth - 20));
+        var maxW = Math.max(200, Math.min(maxWFromCap, maxWViewport));
+        var width = Math.min(Math.max(Math.round(baseW), 180), Math.round(maxW));
+        // Apply and check text fit, expand until it fits or reaches maxW
+        function applyWidth(w){ balloonEl.style.width = Math.round(w) + 'px'; }
+        applyWidth(width);
+        // Force a layout before measuring
+        void balloonEl.offsetWidth;
+        var tries = 0;
+        while (tries < 8) {
+          var fits = balloonTextEl.scrollHeight <= balloonTextEl.clientHeight;
+          if (fits || width >= maxW - 1) break;
+          width = Math.min(Math.round(width * 1.14), Math.round(maxW));
+          applyWidth(width);
+          void balloonEl.offsetWidth;
+          tries++;
+        }
+      }
+      function showBalloonFor(name){
+        ensureBalloon();
+        var text = getAvatarMsg(name);
+        if (balloonTextEl) balloonTextEl.textContent = text;
+        sizeBalloonForText(name);
+        positionBalloonOver(name);
+        try {
+          if (balloonEl) {
+            if (name === 'penguin') balloonEl.classList.add('is-flipped');
+            else balloonEl.classList.remove('is-flipped');
+          }
+        } catch(e) {}
+        if (reducedMotion) {
+          balloonEl.classList.add('is-visible');
+        } else {
+          // If previously visible for another avatar, ensure restart of transition
+          balloonEl.classList.remove('is-visible');
+          // Force reflow to restart CSS transition
+          void balloonEl.offsetWidth; // eslint-disable-line no-unused-expressions
+          balloonEl.classList.add('is-visible');
+        }
+        balloonVisibleFor = name;
+      }
+      function switchBalloonTo(name){
+        ensureBalloon();
+        if (!balloonVisibleFor) { showBalloonFor(name); return; }
+        if (balloonVisibleFor === name) { showBalloonFor(name); return; }
+        if (reducedMotion) {
+          showBalloonFor(name);
+          return;
+        }
+        // Fade out, then update, then fade in
+        balloonEl.classList.remove('is-visible');
+        setTimeout(function(){ showBalloonFor(name); }, BALLOON_FADE_MS);
+      }
       function ensureLayers(name){
         var parent = document.getElementById('avatar' + capitalize(name) + 'Anim');
         if (!parent) return null;
@@ -751,6 +900,10 @@
           try { idleAnim.pause(); } catch(e) {}
           try { tapAnim.goToAndPlay(0, true); } catch(e) {}
           states[name] = 'tap';
+          try {
+            var cardTap = document.getElementById('avatar' + capitalize(name) + 'Card');
+            if (cardTap) cardTap.classList.add('is-active');
+          } catch(e) {}
         } else {
           layers.tap.setAttribute('hidden', '');
           layers.idle.removeAttribute('hidden');
@@ -760,6 +913,10 @@
             else { idleAnim.goToAndStop(0, true); }
           } catch(e) {}
           states[name] = 'idle';
+          try {
+            var cardIdle = document.getElementById('avatar' + capitalize(name) + 'Card');
+            if (cardIdle) cardIdle.classList.remove('is-active');
+          } catch(e) {}
         }
         updateCardSizeByName(name);
       }
@@ -771,21 +928,19 @@
         if (states[name] === 'tap') return;
         // Revert previously active to idle
         if (currentActive && currentActive !== name) {
+          try {
+            var prevCard = document.getElementById('avatar' + capitalize(currentActive) + 'Card');
+            if (prevCard) prevCard.classList.remove('is-active');
+          } catch(e) {}
           showLayer(currentActive, 'idle');
         }
         showLayer(name, 'tap');
         currentActive = name;
         try { attachSizeObservers(name); } catch(e) {}
         setTimeout(function(){ updateCardSizeByName(name); attachSizeObservers(name); }, 50);
-        // Update message
-        var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
-        var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
-        var msgEl = document.getElementById('heroMsg');
-        if (msgEl) {
-          var key = name === 'fox' ? '#foxMsg' : (name === 'bear' ? '#bearMsg' : '#penguinMsg');
-          var text = dict[key];
-          if (typeof text === 'string') msgEl.textContent = text;
-        }
+        // Hide hero message and show/update speech balloon
+        hideHeroMsgWithFade();
+        if (!balloonVisibleFor) { showBalloonFor(name); } else { switchBalloonTo(name); }
         if (typeof gtag === 'function') {
           gtag('event', 'avatar_tap', { character: name, transport_type: 'beacon' });
         }
@@ -922,10 +1077,16 @@
       // Initial size adjustment and observers
       setTimeout(function(){ updateAllCardSizes(); attachSizeObservers('fox'); attachSizeObservers('bear'); attachSizeObservers('penguin'); }, 120);
       try { window.addEventListener('resize', updateAllCardSizes); } catch(e) {}
-      try { window.addEventListener('resize', function(){ recalcHeroMsgHeight(); }); } catch(e) {}
+      try {
+        window.addEventListener('resize', function(){
+          recalcHeroMsgHeight();
+          if (balloonVisibleFor) { sizeBalloonForText(balloonVisibleFor); positionBalloonOver(balloonVisibleFor); }
+        });
+        window.addEventListener('scroll', function(){ if (balloonVisibleFor) { sizeBalloonForText(balloonVisibleFor); positionBalloonOver(balloonVisibleFor); } }, { passive: true });
+      } catch(e) {}
       // React to language changes by resetting default message via MutationObserver on <html lang>
       try {
-        var mo = new MutationObserver(function(m){ initHeroMsg(); recalcHeroMsgHeight(); updateCtaLabels(); updateAvatarAria(); });
+        var mo = new MutationObserver(function(m){ initHeroMsg(); recalcHeroMsgHeight(); updateCtaLabels(); updateAvatarAria(); if (balloonVisibleFor) { showBalloonFor(balloonVisibleFor); } });
         mo.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
       } catch(e) {}
       function updateCtaLabels(){
