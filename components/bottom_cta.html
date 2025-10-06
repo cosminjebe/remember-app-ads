@@ -1,0 +1,45 @@
+<section class="bottom-cta" id="bottom-cta" aria-label="Install Remember">
+  <div class="bottom-cta-inner">
+    <h2 id="bottomCtaTitle" class="bottom-cta-title">Ready to remember better?</h2>
+    <a id="bottomCtaPrimaryBtn" href="#" class="bottom-cta-btn" aria-label="Get Remember">
+      <span id="bottomCtaPrimary">Get Remember</span>
+    </a>
+    <p id="bottomCtaHelper" class="bottom-cta-helper">Made by an indie team 💛</p>
+    <div class="bottom-cta-badges">
+      <a id="bottomAppleBadge" href="https://apps.apple.com/ro/app/remember-memory-companion/id6747390663" aria-label="App Store" class="badge-link">
+        <img src="images/downloadApple.webp" alt="App Store" class="store-badge" loading="lazy" />
+      </a>
+      <a id="bottomGoogleBadge" href="https://play.google.com/store/apps/details?id=com.supercrg.remember" aria-label="Google Play" class="badge-link">
+        <img src="images/downloadGoogle.webp" alt="Google Play" class="store-badge" loading="lazy" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Sticky mobile CTA -->
+<div id="stickyCta" class="sticky-cta" aria-label="Sticky install bar">
+  <button id="stickyCtaPrimaryBtn" class="sticky-cta-btn" aria-label="Get Remember">
+    <img src="images/appIcon.webp" alt="" width="20" height="20" class="sticky-icon" />
+    <span id="stickyCtaLabel">Get Remember</span>
+  </button>
+</div>
+
+<!-- Store chooser modal -->
+<div id="storeChooser" class="chooser-overlay" hidden>
+  <div class="chooser-dialog" role="dialog" aria-modal="true" aria-labelledby="storeChooserTitle">
+    <h3 id="storeChooserTitle" class="chooser-title">Choose your store</h3>
+    <div class="chooser-actions">
+      <a id="chooserApple" href="#" class="chooser-btn" aria-label="App Store (iOS)"><span id="storeChooserApple">App Store (iOS)</span></a>
+      <a id="chooserGoogle" href="#" class="chooser-btn" aria-label="Google Play (Android)"><span id="storeChooserGoogle">Google Play (Android)</span></a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // Bind smart CTA handlers once component is injected
+    try { if (window.__bindSmartCtas) window.__bindSmartCtas(); } catch(e) {}
+  })();
+</script>
+
+
