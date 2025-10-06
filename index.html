@@ -92,6 +92,7 @@
       align-items: center;
       justify-content: center;
       min-height: 4.5em;
+      max-height: 50px;
       width: 100%;
     }
     .hero-ctas {
@@ -548,6 +549,7 @@
       var balloonTextEl = null;
       var balloonVisibleFor = null; // avatar name when visible
       var hasDismissedHeroMsg = false; // hide message-box after first tap
+      var heroMsgInitialHeight = null; // remember initial message box height for restore
       var BALLOON_IMG_SRC = 'images/dialogueBaloon.webp';
       var BALLOON_FADE_MS = 220;
       var BALLOON_MAX_H = 260; // keep in sync with CSS max-height
@@ -620,6 +622,10 @@
           msgEl.setAttribute('aria-hidden', 'false');
           msgEl.style.visibility = 'visible';
           msgEl.textContent = text;
+          // Restore initial height if captured
+          if (heroMsgInitialHeight != null && heroMsgInitialHeight > 0) {
+            msgEl.style.height = heroMsgInitialHeight + 'px';
+          }
           msgEl.style.transition = 'opacity .22s ease';
           msgEl.style.opacity = '0';
           hasDismissedHeroMsg = false;
@@ -949,6 +955,18 @@
         if (msgEl && msgEl.getAttribute('data-frozen') !== '1' && dict && typeof dict['#heroDefault'] === 'string') {
           
           msgEl.textContent = dict['#heroDefault'];
+          // Capture initial height once for later restore
+          try {
+            if (heroMsgInitialHeight == null) {
+              // After text set, allow layout settle then read height
+              setTimeout(function(){
+                try {
+                  var h = msgEl.getBoundingClientRect().height;
+                  if (h && h > 0) heroMsgInitialHeight = Math.round(h);
+                } catch(e) {}
+              }, 0);
+            }
+          } catch(e) {}
         }
       }
       function recalcHeroMsgHeight(){
@@ -981,7 +999,10 @@
             if (h > maxH) maxH = h;
           }
           measurer.remove();
-          if (maxH > 0) {
+          if (heroMsgInitialHeight != null && heroMsgInitialHeight > 0) {
+            // Lock to initial measured height to avoid growth on mobile after restore
+            msgEl.style.height = heroMsgInitialHeight + 'px';
+          } else if (maxH > 0) {
             msgEl.style.height = maxH + 'px';
           }
         } catch(e) {}
