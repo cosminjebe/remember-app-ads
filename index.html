@@ -86,7 +86,10 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
       padding: 12px 14px;
-      text-align: left;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       min-height: 4.5em;
     }
     .hero-ctas {
@@ -845,6 +848,40 @@
           msgEl.textContent = dict['#heroDefault'];
         }
       }
+      function recalcHeroMsgHeight(){
+        try {
+          var msgEl = document.getElementById('heroMsg');
+          if (!msgEl) return;
+          var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+          var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+          var candidates = ['#heroDefault', '#foxMsg', '#bearMsg', '#penguinMsg']
+            .map(function(k){ return typeof dict[k] === 'string' ? dict[k] : ''; });
+          var measurer = document.createElement('div');
+          measurer.className = 'message-box';
+          measurer.style.position = 'absolute';
+          measurer.style.visibility = 'hidden';
+          measurer.style.left = '-9999px';
+          measurer.style.top = '0';
+          measurer.style.height = 'auto';
+          measurer.style.minHeight = '0';
+          measurer.style.maxHeight = 'none';
+          // match current width for accurate wrapping
+          var width = msgEl.clientWidth || msgEl.getBoundingClientRect().width;
+          if (width) measurer.style.width = width + 'px';
+          document.body.appendChild(measurer);
+          var maxH = 0;
+          for (var i = 0; i < candidates.length; i++) {
+            measurer.textContent = candidates[i];
+            // force reflow
+            var h = measurer.scrollHeight;
+            if (h > maxH) maxH = h;
+          }
+          measurer.remove();
+          if (maxH > 0) {
+            msgEl.style.height = maxH + 'px';
+          }
+        } catch(e) {}
+      }
       function initCtas(){
         var primary = document.getElementById('heroCtaPrimary');
         var secondary = document.getElementById('heroCtaSecondary');
@@ -872,6 +909,7 @@
       try { window.__i18n = Object.assign({}, window.__i18n, (function(){ var scr = document.querySelector('script:nth-of-type(2)'); return window.__i18n; })()); } catch(e) {}
       // During i18n init, we already set hero default text; ensure again here
       initHeroMsg();
+      recalcHeroMsgHeight();
       // Init avatars with dual layers (idle + tap preloaded)
       initAvatar('fox');
       initAvatar('bear');
@@ -884,9 +922,10 @@
       // Initial size adjustment and observers
       setTimeout(function(){ updateAllCardSizes(); attachSizeObservers('fox'); attachSizeObservers('bear'); attachSizeObservers('penguin'); }, 120);
       try { window.addEventListener('resize', updateAllCardSizes); } catch(e) {}
+      try { window.addEventListener('resize', function(){ recalcHeroMsgHeight(); }); } catch(e) {}
       // React to language changes by resetting default message via MutationObserver on <html lang>
       try {
-        var mo = new MutationObserver(function(m){ initHeroMsg(); updateCtaLabels(); updateAvatarAria(); });
+        var mo = new MutationObserver(function(m){ initHeroMsg(); recalcHeroMsgHeight(); updateCtaLabels(); updateAvatarAria(); });
         mo.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
       } catch(e) {}
       function updateCtaLabels(){
