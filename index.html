@@ -133,8 +133,8 @@
     .shot-img { width: 100%; height: auto; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: transform .2s ease, filter .2s ease; display: block; }
     .shot-img:hover { transform: translateY(-3px); filter: brightness(1.03); }
     .shot-cap { font-size: 13px; color: #555; margin: 6px 0 0; text-align: center; }
-    /* Mobile: overlay arrows aligned to the scroller width */
-    .shots-nav { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: var(--shot-width); pointer-events: none; }
+    /* Mobile: overlay arrows aligned and placed outside the image area */
+    .shots-nav { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: calc(var(--shot-width) + 80px); pointer-events: none; }
     .shots-btn {
       position: absolute;
       top: 50%;
@@ -150,8 +150,8 @@
       pointer-events: auto;
     }
     .shots-btn:focus-visible { outline: 3px solid #3366cc; outline-offset: 2px; }
-    #shotsPrev { left: -6px; }
-    #shotsNext { right: -6px; }
+    #shotsPrev { left: 0; }
+    #shotsNext { right: 0; }
     @media (min-width: 992px) {
       /* Desktop: 3 fixed-width columns, no scroller */
       .showcase-inner { grid-template-columns: repeat(3, var(--shot-width)); justify-content: center; align-items: start; }
@@ -160,6 +160,7 @@
       .screenshots { display: contents; }
       .shots-scroller { display: contents; overflow: visible; padding-bottom: 0; width: auto; margin: 0; scroll-snap-type: none; }
       .shot { width: var(--shot-width); }
+      .shot-img { width: var(--shot-width); height: calc(var(--shot-width) * (16 / 9)); object-fit: cover; }
       /* Make video as big as a screenshot card on desktop */
       .showcase-video { display: flex; justify-content: center; }
       .showcase-video .video-wrapper { width: var(--shot-width); }
@@ -1206,20 +1207,34 @@
         }
         var prevBtn = document.getElementById('shotsPrev');
         var nextBtn = document.getElementById('shotsNext');
+        function updateArrowVisibility(){
+          if (!prevBtn || !nextBtn) return;
+          var atStart = scroller.scrollLeft <= 1;
+          var atEnd = (scroller.scrollLeft + scroller.clientWidth) >= (scroller.scrollWidth - 1);
+          if (atStart) { prevBtn.setAttribute('hidden',''); prevBtn.setAttribute('aria-hidden','true'); }
+          else { prevBtn.removeAttribute('hidden'); prevBtn.setAttribute('aria-hidden','false'); }
+          if (atEnd) { nextBtn.setAttribute('hidden',''); nextBtn.setAttribute('aria-hidden','true'); }
+          else { nextBtn.removeAttribute('hidden'); nextBtn.setAttribute('aria-hidden','false'); }
+        }
         function snapToNearest(){
           var w = scroller.getBoundingClientRect().width;
           var i = Math.round(scroller.scrollLeft / (w + 12));
           scroller.scrollTo({ left: i * (w + 12), behavior: 'smooth' });
+          // Update arrow visibility after snapping
+          setTimeout(updateArrowVisibility, 180);
         }
         var snapTimer;
         scroller.addEventListener('scroll', function(){
           clearTimeout(snapTimer);
           snapTimer = setTimeout(snapToNearest, 120);
+          updateArrowVisibility();
         }, { passive: true });
         if (prevBtn && nextBtn){
-          prevBtn.addEventListener('click', function(){ scroller.scrollBy({ left: -(scroller.clientWidth + 12), behavior: 'smooth' }); });
-          nextBtn.addEventListener('click', function(){ scroller.scrollBy({ left: (scroller.clientWidth + 12), behavior: 'smooth' }); });
+          prevBtn.addEventListener('click', function(){ scroller.scrollBy({ left: -(scroller.clientWidth + 12), behavior: 'smooth' }); setTimeout(updateArrowVisibility, 50); });
+          nextBtn.addEventListener('click', function(){ scroller.scrollBy({ left: (scroller.clientWidth + 12), behavior: 'smooth' }); setTimeout(updateArrowVisibility, 50); });
         }
+        // Initialize arrow visibility state
+        updateArrowVisibility();
       }
     })();
 
