@@ -159,7 +159,7 @@
       .shots-nav { display: none; }
       .screenshots { display: contents; }
       .shots-scroller { display: contents; overflow: visible; padding-bottom: 0; width: auto; margin: 0; scroll-snap-type: none; }
-      .shot { width: var(--shot-width); }
+      .shot { width: var(--shot-width); margin: 0; }
       .shot-img { width: var(--shot-width); height: calc(var(--shot-width) * (16 / 9)); object-fit: cover; }
       /* Make video as big as a screenshot card on desktop */
       .showcase-video { display: flex; justify-content: center; }
@@ -397,6 +397,7 @@
             .then(function(html){
               var mount = document.getElementById('showcase-root');
               if (mount) mount.innerHTML = html;
+              try { if (typeof window.__initShowcase === 'function') { window.__initShowcase(); } } catch(e) {}
             });
         } catch(e) {}
       })();
@@ -1186,9 +1187,18 @@
         var cta = document.getElementById('privacyStripCtaLink');
         if (cta) cta.addEventListener('click', function(ev){ ev.preventDefault(); var target = document.getElementById('faq'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       } catch(e) {}
-      // Screenshots analytics & nav
-      var scroller = document.getElementById('shotsScroller');
-      if (scroller) {
+      // Screenshots analytics & nav (invoked after showcase inject as well)
+      function __wireShowcase(){
+        var scroller = document.getElementById('shotsScroller');
+        if (!scroller) return;
+        var prevBtn = document.getElementById('shotsPrev');
+        var nextBtn = document.getElementById('shotsNext');
+        // Only apply mobile scroller behavior if overflow is possible
+        var isDesktop = window.matchMedia && window.matchMedia('(min-width: 992px)').matches;
+        if (isDesktop) {
+          if (prevBtn) { try { prevBtn.setAttribute('hidden',''); prevBtn.setAttribute('aria-hidden','true'); } catch(e) {} }
+          if (nextBtn) { try { nextBtn.setAttribute('hidden',''); nextBtn.setAttribute('aria-hidden','true'); } catch(e) {} }
+        }
         var lastScrollFire = 0;
         scroller.addEventListener('scroll', function(){
           var now = Date.now();
@@ -1205,8 +1215,6 @@
             });
           })(i);
         }
-        var prevBtn = document.getElementById('shotsPrev');
-        var nextBtn = document.getElementById('shotsNext');
         function updateArrowVisibility(){
           if (!prevBtn || !nextBtn) return;
           var atStart = scroller.scrollLeft <= 1;
@@ -1236,6 +1244,9 @@
         // Initialize arrow visibility state
         updateArrowVisibility();
       }
+      try { window.__initShowcase = __wireShowcase; } catch(e) { window.__initShowcase = __wireShowcase; }
+      // In case the showcase is already present before this script executes
+      try { __wireShowcase(); } catch(e) {}
     })();
 
     // YouTube player tracking
