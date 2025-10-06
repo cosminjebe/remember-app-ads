@@ -268,10 +268,11 @@
       }
     }
     /* Speech balloon overlay */
-    .speech-balloon { position: absolute; z-index: 10; pointer-events: none; opacity: 0; transform: translateY(6px); transition: opacity .22s ease, transform .22s ease; max-height: 260px; }
-    .speech-balloon.is-visible { opacity: 1; transform: translateY(0); }
-    .speech-balloon-img { display: block; width: 100%; height: auto; }
-    .speech-balloon-text { position: absolute; top: 7%; left: 7%; right: 7%; bottom: 15%; display: flex; align-items: center; justify-content: center; text-align: center; color: #333; font-size: 14px; line-height: 1.35; padding: 0 2px; }
+    .speech-balloon { position: absolute; z-index: 10; pointer-events: none; opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .22s ease, transform .22s ease; max-height: 260px; }
+    .speech-balloon.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
+    .speech-balloon-img { display: block; width: 100%; height: 100%; }
+    .speech-balloon-text { position: absolute; top: 7%; left: 7%; right: 7%; bottom: 15%; display: flex; align-items: center; justify-content: center; text-align: center; color: #333; font-size: 14px; line-height: 1.35; padding: 0 2px; opacity: 0; transition: opacity .22s ease; }
+    .speech-balloon.is-visible.is-img-loaded .speech-balloon-text { opacity: 1; }
     /* Flip only the balloon image for penguin */
     .speech-balloon.is-flipped .speech-balloon-img { transform: scaleX(-1); }
   </style>
@@ -349,7 +350,7 @@
         </div>
       </div>
     </section>
-    <div class="promo">
+   <!-- <div class="promo">
       <p id="promo1">A simple, private self-care app that helps you capture and cherish life’s meaningful moments.</p>
       <p id="promo2">Watch the video below to discover how Remember works and explore all its features.</p>
     </div>
@@ -584,7 +585,11 @@
           var text = dict[idKey];
           if (typeof text !== 'string') return;
           el = document.getElementById(elId);
-          if (el) el.textContent = text;
+          if (!el) return;
+          // Do not overwrite heroMsg after it has been frozen by interaction
+          if (elId === 'heroMsg' && el.getAttribute('data-frozen') === '1') return;
+          
+          el.textContent = text;
         }
         setText('#h1Title','h1Title');
         setText('#caption','caption');
@@ -691,11 +696,15 @@
       var BALLOON_IMG_SRC = 'images/dialogueBaloon.webp';
       var BALLOON_FADE_MS = 220;
       var BALLOON_MAX_H = 260; // keep in sync with CSS max-height
+      
 
       function ensureBalloon(){
         if (balloonEl) return balloonEl;
         var el = document.createElement('div');
         el.className = 'speech-balloon';
+        // Start offscreen to avoid first-frame flash before positioning
+        el.style.left = '-10000px';
+        el.style.top = '-10000px';
         var img = new Image();
         img.src = BALLOON_IMG_SRC;
         img.alt = '';
@@ -710,6 +719,8 @@
         // Capture aspect ratio and reposition after image loads
         img.addEventListener('load', function(){
           try { el.__balloonAR = (img.naturalWidth && img.naturalHeight) ? (img.naturalWidth / img.naturalHeight) : 1.45; } catch(e) { el.__balloonAR = 1.45; }
+          
+          if (balloonEl) balloonEl.classList.add('is-img-loaded');
           if (balloonVisibleFor) { sizeBalloonForText(balloonVisibleFor); positionBalloonOver(balloonVisibleFor); }
         });
         return el;
@@ -730,8 +741,13 @@
         var msgEl = document.getElementById('heroMsg');
         if (!msgEl) { hasDismissedHeroMsg = true; return; }
         try {
+          
           msgEl.style.transition = 'opacity .22s ease';
           msgEl.style.opacity = '0';
+          // Freeze box to prevent any subsequent text assignments
+          msgEl.setAttribute('data-frozen', '1');
+          // Remove text immediately to avoid any flash
+          msgEl.textContent = '';
           // Keep space reserved; do not collapse the box
           msgEl.setAttribute('aria-hidden', 'true');
         } catch(e) {}
@@ -792,22 +808,52 @@
         ensureBalloon();
         var text = getAvatarMsg(name);
         if (balloonTextEl) balloonTextEl.textContent = text;
+        // Size and position BEFORE toggling visibility to avoid flicker
+        
         sizeBalloonForText(name);
         positionBalloonOver(name);
+        
         try {
           if (balloonEl) {
             if (name === 'penguin') balloonEl.classList.add('is-flipped');
             else balloonEl.classList.remove('is-flipped');
           }
         } catch(e) {}
+        // Ensure the element starts fully hidden to avoid any intermediate paint
+        if (balloonEl) { balloonEl.classList.remove('is-visible'); balloonEl.style.visibility = 'hidden'; }
+        // Debug: log when the text actually becomes visible (end of opacity transition)
+        try {
+          if (balloonTextEl) {
+            var onceFn = function(ev){
+              if (ev && ev.propertyName === 'opacity' && balloonEl && balloonEl.classList && balloonEl.classList.contains('is-visible')) { }
+            };
+            balloonTextEl.addEventListener('transitionend', onceFn, { once: true });
+          }
+        } catch(e) {}
         if (reducedMotion) {
+          
+          if (balloonEl) balloonEl.style.visibility = 'visible';
           balloonEl.classList.add('is-visible');
+          
         } else {
           // If previously visible for another avatar, ensure restart of transition
           balloonEl.classList.remove('is-visible');
           // Force reflow to restart CSS transition
           void balloonEl.offsetWidth; // eslint-disable-line no-unused-expressions
+          
+          if (balloonEl) balloonEl.style.visibility = 'visible';
           balloonEl.classList.add('is-visible');
+          // Also verify via RAF after style application
+          try {
+            requestAnimationFrame(function(){
+              requestAnimationFrame(function(){
+                if (!balloonTextEl) return;
+                var op = '';
+                try { op = window.getComputedStyle(balloonTextEl).opacity; } catch(e) {}
+                if (op === '1') { }
+              });
+            });
+          } catch(e) {}
         }
         balloonVisibleFor = name;
       }
@@ -820,8 +866,17 @@
           return;
         }
         // Fade out, then update, then fade in
+        
         balloonEl.classList.remove('is-visible');
-        setTimeout(function(){ showBalloonFor(name); }, BALLOON_FADE_MS);
+        setTimeout(function(){
+          // Pre-size and position while hidden to avoid flicker
+          if (balloonTextEl) balloonTextEl.textContent = getAvatarMsg(name);
+          sizeBalloonForText(name);
+          positionBalloonOver(name);
+          try { if (balloonEl) { if (name === 'penguin') balloonEl.classList.add('is-flipped'); else balloonEl.classList.remove('is-flipped'); } } catch(e) {}
+          // Then show
+          showBalloonFor(name);
+        }, BALLOON_FADE_MS);
       }
       function ensureLayers(name){
         var parent = document.getElementById('avatar' + capitalize(name) + 'Anim');
@@ -923,6 +978,7 @@
       function playTap(name){
         var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
         if (!container || !window.lottie) return;
+        
         initAvatar(name);
         // If tapped avatar is already active, do nothing
         if (states[name] === 'tap') return;
@@ -938,7 +994,8 @@
         currentActive = name;
         try { attachSizeObservers(name); } catch(e) {}
         setTimeout(function(){ updateCardSizeByName(name); attachSizeObservers(name); }, 50);
-        // Hide hero message and show/update speech balloon
+        // Hide hero message and show/update speech balloon (synchronously clear text first to avoid flash)
+        try { var hm = document.getElementById('heroMsg'); if (hm) { hm.textContent = ''; hm.setAttribute('data-frozen','1'); hm.setAttribute('aria-hidden','true'); hm.style.opacity = '0'; hm.style.visibility = 'hidden'; } } catch(e) {}
         hideHeroMsgWithFade();
         if (!balloonVisibleFor) { showBalloonFor(name); } else { switchBalloonTo(name); }
         if (typeof gtag === 'function') {
@@ -999,12 +1056,14 @@
         var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
         var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
         var msgEl = document.getElementById('heroMsg');
-        if (msgEl && dict && typeof dict['#heroDefault'] === 'string') {
+        if (msgEl && msgEl.getAttribute('data-frozen') !== '1' && dict && typeof dict['#heroDefault'] === 'string') {
+          
           msgEl.textContent = dict['#heroDefault'];
         }
       }
       function recalcHeroMsgHeight(){
         try {
+          if (hasDismissedHeroMsg) return; // do not measure or mutate after first tap
           var msgEl = document.getElementById('heroMsg');
           if (!msgEl) return;
           var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
