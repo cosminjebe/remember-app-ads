@@ -70,7 +70,11 @@
       align-self: flex-end; /* ensure bottom alignment as a flex item */
       /* taie 10% din stânga și 10% din dreapta */
       clip-path: inset(0 0% 0 0%);
+      position: relative; /* allow layering of idle/tap */
+      min-height: 160px; /* fallback so absolute layers are visible pre-size */
     }
+    .avatar-layer { position: absolute; inset: 0; }
+    .avatar-layer[hidden] { display: none; }
     .avatar-card:focus-visible {
       outline: 3px solid #3366cc;
       outline-offset: 2px;
@@ -385,6 +389,11 @@
   </div>
 
   <link rel="preload" href="JSONS/avatars/foxDefault.json" as="fetch" />
+  <link rel="preload" href="JSONS/avatars/foxTap.json" as="fetch" />
+  <link rel="preload" href="JSONS/avatars/bearDefault.json" as="fetch" />
+  <link rel="preload" href="JSONS/avatars/bearTap.json" as="fetch" />
+  <link rel="preload" href="JSONS/avatars/penguinDefault.json" as="fetch" />
+  <link rel="preload" href="JSONS/avatars/penguinTap.json" as="fetch" />
 
   <!-- I18N -->
   <script>
@@ -658,45 +667,110 @@
         penguin: { idle: 'JSONS/avatars/penguinDefault.json', tap: 'JSONS/avatars/penguinTap.json' }
       };
       var players = {};
+      var states = { fox: 'idle', bear: 'idle', penguin: 'idle' };
       var currentActive = null; // which avatar is currently in TAP loop
-      function loadIdle(name){
-        var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
-        if (!container || !window.lottie) return;
-        if (players[name]) { try { players[name].destroy(); } catch(e) {} }
-        players[name] = lottie.loadAnimation({
-          container: container,
+      function ensureLayers(name){
+        var parent = document.getElementById('avatar' + capitalize(name) + 'Anim');
+        if (!parent) return null;
+        var idle = parent.querySelector('.avatar-layer.idle');
+        if (!idle) {
+          idle = document.createElement('div');
+          idle.className = 'avatar-layer idle';
+          idle.setAttribute('data-layer', 'idle');
+          idle.setAttribute('hidden', '');
+          parent.appendChild(idle);
+        }
+        var tap = parent.querySelector('.avatar-layer.tap');
+        if (!tap) {
+          tap = document.createElement('div');
+          tap.className = 'avatar-layer tap';
+          tap.setAttribute('data-layer', 'tap');
+          tap.setAttribute('hidden', '');
+          parent.appendChild(tap);
+        }
+        return { parent: parent, idle: idle, tap: tap };
+      }
+      function initAvatar(name){
+        if (!window.lottie) return;
+        var layers = ensureLayers(name);
+        if (!layers) return;
+        // If already initialized, just ensure we show current state
+        if (players[name] && players[name].idle && players[name].tap) {
+          showLayer(name, states[name] || 'idle');
+          return;
+        }
+        // Destroy any stray instances
+        try {
+          if (players[name] && players[name].idle) players[name].idle.destroy();
+          if (players[name] && players[name].tap) players[name].tap.destroy();
+        } catch(e) {}
+        var idleAnim = lottie.loadAnimation({
+          container: layers.idle,
           renderer: 'svg',
           loop: !reducedMotion,
-          autoplay: true,
-          path: assets[name].idle
+          autoplay: false,
+          path: assets[name].idle,
+          rendererSettings: { progressiveLoad: true }
         });
-        try { players[name].addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); }); } catch(e) {}
+        var tapAnim = lottie.loadAnimation({
+          container: layers.tap,
+          renderer: 'svg',
+          loop: !reducedMotion,
+          autoplay: false,
+          path: assets[name].tap,
+          rendererSettings: { progressiveLoad: true }
+        });
+        players[name] = { idle: idleAnim, tap: tapAnim };
+        // Pre-render first frame of tap offscreen to avoid first-show blank
+        try { tapAnim.goToAndStop(0, true); } catch(e) {}
+        // Size updates when layers load
+        try { idleAnim.addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); }); } catch(e) {}
+        try { tapAnim.addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); }); } catch(e) {}
+        // Reduced motion: when tap completes, return to idle
+        if (reducedMotion) {
+          try { tapAnim.addEventListener('complete', function(){ showLayer(name, 'idle'); }); } catch(e) {}
+        }
+        // Start with idle visible
+        states[name] = 'idle';
+        showLayer(name, 'idle');
         setTimeout(function(){ updateCardSizeByName(name); }, 50);
+      }
+      function showLayer(name, layer){
+        var layers = ensureLayers(name);
+        if (!layers || !players[name]) return;
+        var idleAnim = players[name].idle;
+        var tapAnim = players[name].tap;
+        if (layer === 'tap') {
+          layers.idle.setAttribute('hidden', '');
+          layers.tap.removeAttribute('hidden');
+          try { idleAnim.pause(); } catch(e) {}
+          try { tapAnim.goToAndPlay(0, true); } catch(e) {}
+          states[name] = 'tap';
+        } else {
+          layers.tap.setAttribute('hidden', '');
+          layers.idle.removeAttribute('hidden');
+          try { tapAnim.pause(); } catch(e) {}
+          try {
+            if (!reducedMotion) { idleAnim.play(); }
+            else { idleAnim.goToAndStop(0, true); }
+          } catch(e) {}
+          states[name] = 'idle';
+        }
+        updateCardSizeByName(name);
       }
       function playTap(name){
         var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
         if (!container || !window.lottie) return;
-        // Ensure other avatars go back to idle
-        ['fox','bear','penguin'].forEach(function(other){
-          if (other === name) return;
-          try { if (players[other]) players[other].destroy(); } catch(e) {}
-          loadIdle(other);
-        });
-        if (players[name]) { try { players[name].destroy(); } catch(e) {} }
-        var anim = lottie.loadAnimation({
-          container: container,
-          renderer: 'svg',
-          loop: !reducedMotion, // tap loops until another avatar is tapped (unless reduced motion)
-          autoplay: true,
-          path: assets[name].tap
-        });
-        players[name] = anim;
-        currentActive = name;
-        if (reducedMotion) {
-          // In reduced motion, do not loop; fall back to idle after one play
-          try { anim.addEventListener('complete', function(){ loadIdle(name); }); } catch(e) {}
+        initAvatar(name);
+        // If tapped avatar is already active, do nothing
+        if (states[name] === 'tap') return;
+        // Revert previously active to idle
+        if (currentActive && currentActive !== name) {
+          showLayer(currentActive, 'idle');
         }
-        try { anim.addEventListener('DOMLoaded', function(){ updateCardSizeByName(name); attachSizeObservers(name); }); } catch(e) {}
+        showLayer(name, 'tap');
+        currentActive = name;
+        try { attachSizeObservers(name); } catch(e) {}
         setTimeout(function(){ updateCardSizeByName(name); attachSizeObservers(name); }, 50);
         // Update message
         var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
@@ -725,11 +799,13 @@
           var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
           var card = document.getElementById('avatar' + capitalize(name) + 'Card');
           if (!container || !card) return;
-          var target = container.querySelector('svg') || container;
+          var target = container.querySelector('.avatar-layer:not([hidden]) svg') || container.querySelector('svg') || container;
           var rect = target.getBoundingClientRect();
           if (rect && rect.width && rect.height) {
             card.style.width = Math.ceil(rect.width) + 'px';
             card.style.height = Math.ceil(rect.height) + 'px';
+            container.style.width = Math.ceil(rect.width) + 'px';
+            container.style.height = Math.ceil(rect.height) + 'px';
           }
         } catch(e) {}
       }
@@ -743,13 +819,13 @@
           if (!container) return;
           var ro = new ResizeObserver(function(){ updateCardSizeByName(name); });
           ro.observe(container);
-          var svg = container.querySelector('svg');
-          if (svg) ro.observe(svg);
-          // Watch for the svg being (re)inserted by lottie
+          var svgs = container.querySelectorAll('svg');
+          svgs.forEach(function(s){ ro.observe(s); });
+          // Watch for svg insertions by lottie across both layers
           var mo = new MutationObserver(function(){
             try {
-              var s = container.querySelector('svg');
-              if (s) ro.observe(s);
+              var sv = container.querySelectorAll('svg');
+              sv.forEach(function(s){ ro.observe(s); });
             } catch(e) {}
             updateCardSizeByName(name);
           });
@@ -794,10 +870,10 @@
       try { window.__i18n = Object.assign({}, window.__i18n, (function(){ var scr = document.querySelector('script:nth-of-type(2)'); return window.__i18n; })()); } catch(e) {}
       // During i18n init, we already set hero default text; ensure again here
       initHeroMsg();
-      // Init avatars
-      loadIdle('fox');
-      loadIdle('bear');
-      loadIdle('penguin');
+      // Init avatars with dual layers (idle + tap preloaded)
+      initAvatar('fox');
+      initAvatar('bear');
+      initAvatar('penguin');
       addCardHandlers('fox');
       addCardHandlers('bear');
       addCardHandlers('penguin');
