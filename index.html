@@ -298,6 +298,35 @@
     /* Flip only the balloon image for penguin */
     .speech-balloon.is-flipped .speech-balloon-img { transform: scaleX(-1); }
   </style>
+  <style>
+    /* Sticky mobile CTA */
+    .sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; display: none; }
+    .sticky-cta-inner { margin: 0 auto; max-width: 800px; padding: 0 16px 16px; }
+    .sticky-cta-btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: #3366cc;
+      color: #fff;
+      font-size: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+    .sticky-cta-btn:focus-visible { outline: 3px solid #ffffff; outline-offset: 2px; }
+    .sticky-icon { width: 18px; height: 18px; border-radius: 4px; }
+    .sticky-cta-spacer { height: 0; }
+    /* Only show on small screens */
+    @media (max-width: 991px) {
+      .sticky-cta { display: block; }
+      /* Add bottom space so content isn't hidden behind the sticky bar */
+      .sticky-cta-spacer { height: 72px; }
+    }
+  </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-7M424SWMFB"></script>
   <script>
@@ -342,7 +371,7 @@
           </div>
         </div>
         <div class="hero-ctas">
-          <button id="heroCtaPrimary" class="btn btn-primary" aria-label=""></button>
+         <!-- <button id="heroCtaPrimary" class="btn btn-primary" aria-label=""></button> -->
           <button id="heroCtaSecondary" class="btn btn-secondary" aria-label=""></button>
         </div>
       </div>
@@ -424,6 +453,7 @@
       <span>•</span>
       <a id="footerPrivacy" href="privacy.html"></a>
     </div>
+    <div class="sticky-cta-spacer" aria-hidden="true"></div>
   </div>
 
   <link rel="preload" href="JSONS/avatars/foxDefault.json" as="fetch" />
@@ -1274,6 +1304,37 @@
         }
       });
     }
+  </script>
+  <!-- Sticky CTA markup placed at end of body for quick paint without layout shift -->
+  <div class="sticky-cta" aria-label="Sticky install bar">
+    <div class="sticky-cta-inner">
+      <button id="stickyCtaBtn" class="sticky-cta-btn" aria-label="Download the app">
+        <img src="images/appIcon.webp" alt="" width="18" height="18" class="sticky-icon" />
+        <span id="stickyCtaLabel">Download the app</span>
+      </button>
+    </div>
+  </div>
+  <script>
+    (function initStickyCta(){
+      var btn = document.getElementById('stickyCtaBtn');
+      if (!btn) return;
+      function getStoreHref(){
+        var appleHref = (document.getElementById('appleLink') || {}).href || 'https://apps.apple.com/ro/app/remember-memory-companion/id6747390663';
+        var googleHref = (document.getElementById('googleLink') || {}).href || 'https://play.google.com/store/apps/details?id=com.supercrg.remember';
+        var ua = (navigator.userAgent || '').toLowerCase();
+        var isAndroid = /android/.test(ua);
+        var isIOS = /(iphone|ipad|ipod)/.test(ua);
+        if (isAndroid) return googleHref;
+        if (isIOS) return appleHref;
+        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent || '');
+        return isSafari ? appleHref : googleHref;
+      }
+      btn.addEventListener('click', function(){
+        var target = getStoreHref();
+        if (typeof gtag === 'function') { gtag('event', 'cta_click', { location: 'sticky', type: 'primary', transport_type: 'beacon' }); }
+        if (target) { window.location.href = target; }
+      });
+    })();
   </script>
 </body>
 </html>
