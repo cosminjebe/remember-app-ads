@@ -75,6 +75,8 @@
     }
     .avatar-layer { position: absolute; inset: 0; }
     .avatar-layer[hidden] { display: none; }
+    /* Remove mobile tap highlight on avatars */
+    .avatar-card, .avatar-anim { -webkit-tap-highlight-color: transparent; }
     .avatar-card:focus-visible {
       outline: 3px solid #3366cc;
       outline-offset: 2px;
