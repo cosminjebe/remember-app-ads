@@ -608,6 +608,33 @@
         } catch(e) {}
         hasDismissedHeroMsg = true;
       }
+      function showHeroDefaultWithFade(){
+        try {
+          var msgEl = document.getElementById('heroMsg');
+          if (!msgEl) return;
+          var lang = (function(){ try { return localStorage.getItem('lang') || 'en'; } catch(e){ return 'en'; } })();
+          var dict = (function(){ try { return (window.__i18n && window.__i18n[lang]) || {}; } catch(e) { return {}; } })();
+          var text = (dict && typeof dict['#heroDefault'] === 'string') ? dict['#heroDefault'] : '';
+          // Unfreeze and reveal the message box, then fade in
+          try { msgEl.removeAttribute('data-frozen'); } catch(e) {}
+          msgEl.setAttribute('aria-hidden', 'false');
+          msgEl.style.visibility = 'visible';
+          msgEl.textContent = text;
+          msgEl.style.transition = 'opacity .22s ease';
+          msgEl.style.opacity = '0';
+          hasDismissedHeroMsg = false;
+          try { recalcHeroMsgHeight(); } catch(e) {}
+          try { requestAnimationFrame(function(){ requestAnimationFrame(function(){ msgEl.style.opacity = '1'; }); }); } catch(e) {}
+        } catch(e) {}
+      }
+      function hideBalloonWithFade(){
+        try {
+          if (!balloonEl) { balloonVisibleFor = null; return; }
+          balloonEl.classList.remove('is-visible');
+          setTimeout(function(){ try { balloonEl.style.visibility = 'hidden'; } catch(e) {}; }, BALLOON_FADE_MS);
+          balloonVisibleFor = null;
+        } catch(e) {}
+      }
       function positionBalloonOver(name){
         if (!balloonEl) return;
         try {
@@ -833,6 +860,14 @@
       function playTap(name){
         var container = document.getElementById('avatar' + capitalize(name) + 'Anim');
         if (!container || !window.lottie) return;
+        // If tapping the same active avatar, reset hero state
+        if (currentActive === name && states[name] === 'tap'){
+          showLayer(name, 'idle');
+          currentActive = null;
+          hideBalloonWithFade();
+          showHeroDefaultWithFade();
+          return;
+        }
         
         initAvatar(name);
         // If tapped avatar is already active, do nothing
